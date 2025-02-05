@@ -12,5 +12,8 @@
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-promise": "^7.2.1",
     "prettier": "^3.4.2"
+  },
+  "dependencies": {
+    "dexie": "^4.0.11"
   }
 }
