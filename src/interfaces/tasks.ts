@@ -29,17 +29,17 @@ interface IIntervalTask extends ITask {
 }
 
 interface ITaskDatabase {
-  addCronTask(task: Omit<ICronTask, 'id'>): Promise<ICronTask>;
+  addCronTask(task: Omit<ICronTask, 'id'>): Promise<ICronTask | undefined>;
 
-  addOnceTimeTask(task: Omit<IOnceTimeTask, 'id'>): Promise<IOnceTimeTask>;
+  addOnceTimeTask(task: Omit<IOnceTimeTask, 'id'>): Promise<IOnceTimeTask | undefined>;
 
-  addIntervalTask(task: Omit<IIntervalTask, 'id'>): Promise<IIntervalTask>;
+  addIntervalTask(task: Omit<IIntervalTask, 'id'>): Promise<IIntervalTask | undefined>;
 
-  getAllCronTasks(): Promise<ICronTask[]>;
+  getAllCronTasks(): Promise<ICronTask[] | undefined>;
 
-  getAllOnceTimeTasks(): Promise<IOnceTimeTask[]>;
+  getAllOnceTimeTasks(): Promise<IOnceTimeTask[] | undefined>;
 
-  getAllIntervalTasks(): Promise<IIntervalTask[]>;
+  getAllIntervalTasks(): Promise<IIntervalTask[] | undefined>;
 
   getCronTaskById(id: string): Promise<ICronTask | undefined>;
 
