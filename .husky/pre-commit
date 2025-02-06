@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+echo "✅ Husky is running!"
+
 npx pretty-quick --staged
 npx eslint --fix
