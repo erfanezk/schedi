@@ -11,6 +11,7 @@ interface ITask {
   enabled: boolean;
   dateChanged: number;
   type: TaskType;
+  callback: <T>() => void | Promise<T>;
 }
 
 interface ICronTask extends ITask {
