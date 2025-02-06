@@ -1,5 +1,7 @@
-import { ICronTask, IIntervalTask, IOnceTimeTask, ITaskDatabase } from '@/interfaces';
+import { ICronTask, IIntervalTask, IOnceTimeTask, ITaskDatabase, TaskType } from '@/interfaces';
 import { taskDatabase } from '@/db';
+
+console.log(TaskType);
 
 type ErrorHandler = (error: unknown) => void;
 

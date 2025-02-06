@@ -1,6 +1,6 @@
 enum TaskType {
   CRON = 'cron',
-  PERIODIC = 'periodic',
+  ONCE_TIME = 'onceTime',
   INTERVAL = 'interval',
 }
 
@@ -10,22 +10,26 @@ interface ITask {
   createdAt: number;
   enabled: boolean;
   dateChanged: number;
+  type: TaskType;
 }
 
 interface ICronTask extends ITask {
   schedule: string;
   lastRunAt: number;
   totalRunCount: number;
+  type: TaskType.CRON;
 }
 
 interface IOnceTimeTask extends ITask {
   runAt: number;
+  type: TaskType.ONCE_TIME;
 }
 
 interface IIntervalTask extends ITask {
   interval: number;
   lastRunAt: number;
   totalRunCount: number;
+  type: TaskType.INTERVAL;
 }
 
 interface ITaskDatabase {
