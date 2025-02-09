@@ -4,14 +4,15 @@ enum TaskType {
   INTERVAL = 'interval',
 }
 
+type ICallback = <T>() => void | Promise<T>;
+
 interface ITask {
   id: string;
   name: string;
   createdAt: number;
-  enabled: boolean;
   dateChanged: number;
   type: TaskType;
-  callback: <T>() => void | Promise<T>;
+  callback: ICallback;
 }
 
 interface ICronTask extends ITask {
@@ -28,9 +29,19 @@ interface IOnceTimeTask extends ITask {
 
 interface IIntervalTask extends ITask {
   interval: number;
-  lastRunAt: number;
+  lastRunAt: number | undefined;
   totalRunCount: number;
   type: TaskType.INTERVAL;
+}
+
+interface IIntervalTaskInDB extends Omit<IIntervalTask, 'callback'> {
+  callback: string;
+}
+
+interface ICreateIntervalTaskPayload {
+  name: string;
+  callback: <T>() => void | Promise<T>;
+  interval: number;
 }
 
 interface ITaskDatabase {
@@ -63,8 +74,19 @@ interface ITaskDatabase {
   deleteOnceTimeTask(id: string): Promise<void>;
 
   deleteIntervalTask(id: string): Promise<void>;
+
+  clearAllIntervalTasks(): Promise<void>;
 }
 
-export type { ITask, ITaskDatabase, ICronTask, IIntervalTask, IOnceTimeTask };
+export type {
+  ITask,
+  ITaskDatabase,
+  ICronTask,
+  IIntervalTask,
+  IOnceTimeTask,
+  ICreateIntervalTaskPayload,
+  IIntervalTaskInDB,
+  ICallback,
+};
 
 export { TaskType };

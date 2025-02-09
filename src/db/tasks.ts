@@ -1,13 +1,22 @@
 import Dexie from 'dexie';
-import { ICronTask, IIntervalTask, IOnceTimeTask, ITaskDatabase } from '@/interfaces';
+import {
+  ICreateIntervalTaskPayload,
+  ICronTask,
+  IIntervalTask,
+  IIntervalTaskInDB,
+  IOnceTimeTask,
+  ITaskDatabase,
+  TaskType,
+} from '@/interfaces';
 import { CommonUtils } from '@/utils';
+import functionSerializer from '@/utils/function';
 
 const DB_VERSION = 1;
 
 class TaskDatabase extends Dexie implements ITaskDatabase {
   cronTasks!: Dexie.Table<ICronTask, string>;
   onceTimeTasks!: Dexie.Table<IOnceTimeTask, string>;
-  intervalTasks!: Dexie.Table<IIntervalTask, string>;
+  intervalTasks!: Dexie.Table<IIntervalTaskInDB, string>;
 
   constructor() {
     super('TaskSchedulerDB');
@@ -32,13 +41,23 @@ class TaskDatabase extends Dexie implements ITaskDatabase {
     return { id, ...task };
   }
 
-  async addIntervalTask(task: Omit<IIntervalTask, 'id'>): Promise<IIntervalTask> {
-    const id = await this.intervalTasks.add({
-      ...task,
-      createdAt: new Date().getTime(),
+  async addIntervalTask(payload: ICreateIntervalTaskPayload): Promise<IIntervalTask> {
+    const creationTime = new Date().getTime();
+    const task: IIntervalTaskInDB = {
+      ...payload,
+      callback: functionSerializer.functionToString(payload.callback),
       id: CommonUtils.generateUniqueId(),
+      createdAt: creationTime,
+      dateChanged: creationTime,
+      lastRunAt: undefined,
+      totalRunCount: 0,
+      type: TaskType.INTERVAL,
+    };
+    await this.intervalTasks.add({
+      ...task,
     });
-    return { id, ...task };
+
+    return { ...task, callback: payload.callback };
   }
 
   async addOnceTimeTask(task: Omit<IOnceTimeTask, 'id'>): Promise<IOnceTimeTask> {
@@ -54,8 +73,15 @@ class TaskDatabase extends Dexie implements ITaskDatabase {
     return this.cronTasks.toArray();
   }
 
-  async getAllIntervalTasks(): Promise<IIntervalTask[]> {
-    return this.intervalTasks.toArray();
+  async getAllIntervalTasks(): Promise<IIntervalTask[] | undefined> {
+    const intervals = await this.intervalTasks.toArray();
+    if (intervals) {
+      return intervals.map((interval) => ({
+        ...interval,
+        callback: functionSerializer.stringToFunction(interval.callback),
+      }));
+    }
+    return undefined;
   }
 
   async getAllOnceTimeTasks(): Promise<IOnceTimeTask[]> {
@@ -67,7 +93,15 @@ class TaskDatabase extends Dexie implements ITaskDatabase {
   }
 
   async getIntervalTaskById(id: string): Promise<IIntervalTask | undefined> {
-    return this.intervalTasks.get(id);
+    const res = await this.intervalTasks.get(id);
+
+    if (res) {
+      return {
+        ...res,
+        callback: functionSerializer.stringToFunction(res.callback),
+      };
+    }
+    return undefined;
   }
 
   async getOnceTimeTaskById(id: string): Promise<IOnceTimeTask | undefined> {
@@ -79,7 +113,12 @@ class TaskDatabase extends Dexie implements ITaskDatabase {
   }
 
   async updateIntervalTask(id: string, updates: Partial<IIntervalTask>): Promise<void> {
-    await this.intervalTasks.update(id, updates);
+    await this.intervalTasks.update(id, {
+      ...updates,
+      callback: updates.callback
+        ? functionSerializer.functionToString(updates.callback)
+        : undefined,
+    });
   }
 
   async updateOnceTimeTask(id: string, updates: Partial<IOnceTimeTask>): Promise<void> {
@@ -96,6 +135,10 @@ class TaskDatabase extends Dexie implements ITaskDatabase {
 
   async deleteOnceTimeTask(id: string): Promise<void> {
     await this.onceTimeTasks.delete(id);
+  }
+
+  async clearAllIntervalTasks(): Promise<void> {
+    await this.intervalTasks.clear();
   }
 }
 

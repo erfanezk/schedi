@@ -1,7 +1,11 @@
-import { ICronTask, IIntervalTask, IOnceTimeTask, ITaskDatabase, TaskType } from '@/interfaces';
+import {
+  ICreateIntervalTaskPayload,
+  ICronTask,
+  IIntervalTask,
+  IOnceTimeTask,
+  ITaskDatabase,
+} from '@/interfaces';
 import { taskDatabase } from '@/db';
-
-console.log(TaskType);
 
 type ErrorHandler = (error: unknown) => void;
 
@@ -20,7 +24,7 @@ class TaskService implements ITaskDatabase {
   }
 
   async addIntervalTask(
-    task: Omit<IIntervalTask, 'id'>,
+    task: Omit<ICreateIntervalTaskPayload, 'id'>,
     onError?: ErrorHandler,
   ): Promise<IIntervalTask | undefined> {
     try {
@@ -163,6 +167,15 @@ class TaskService implements ITaskDatabase {
       this.logError('updateIntervalTask', error, id);
       onError?.(error);
       return undefined;
+    }
+  }
+
+  async clearAllIntervalTasks(onError?: ErrorHandler): Promise<void> {
+    try {
+      await taskDatabase.clearAllIntervalTasks();
+    } catch (error) {
+      this.logError('clearAllIntervalTasks', error);
+      onError?.(error);
     }
   }
 
