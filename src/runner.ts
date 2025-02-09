@@ -1,4 +1,4 @@
-import taskService from '@/service/tasks';
+import taskService from '@/services/tasks';
 import { liveQuery } from 'dexie';
 import { IIntervalTask } from '@/interfaces';
 
@@ -74,6 +74,4 @@ class IntervalTaskRunner {
   }
 }
 
-const intervalTaskRunner = new IntervalTaskRunner();
-
-export default intervalTaskRunner;
+export const intervalTaskRunner = new IntervalTaskRunner();
