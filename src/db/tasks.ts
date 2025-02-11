@@ -21,10 +21,10 @@ class TaskDatabase extends Dexie implements ITaskDatabase {
   constructor() {
     super('TaskSchedulerDB');
     this.version(DB_VERSION).stores({
-      cronTasks: 'id, name, createdAt, enabled, dateChanged, schedule, lastRunAt, totalRunCount',
-      onceTimeTasks: 'id, name, createdAt, enabled, dateChanged, runAt',
+      cronTasks: 'id, name, createdAt, change, type, callback',
+      onceTimeTasks: 'id, name, createdAt, change, type, callback, runAt',
       intervalTasks:
-        'id, name, createdAt, enabled, dateChanged, interval, lastRunAt, totalRunCount',
+        'id, name, createdAt, change, type, callback, interval, lastRunAt, totalRunCount, startAt, expireAt',
     });
 
     this.cronTasks = this.table('cronTasks');
@@ -48,7 +48,6 @@ class TaskDatabase extends Dexie implements ITaskDatabase {
       callback: functionSerializer.functionToString(payload.callback),
       id: CommonUtils.generateUniqueId(),
       createdAt: creationTime,
-      dateChanged: creationTime,
       lastRunAt: undefined,
       totalRunCount: 0,
       type: TaskType.INTERVAL,
@@ -142,4 +141,4 @@ class TaskDatabase extends Dexie implements ITaskDatabase {
   }
 }
 
-export const taskDatabase = new TaskDatabase();
+export default TaskDatabase;

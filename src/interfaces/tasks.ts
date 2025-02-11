@@ -10,7 +10,6 @@ interface ITask {
   id: string;
   name: string;
   createdAt: number;
-  dateChanged: number;
   type: TaskType;
   callback: ICallback;
 }
@@ -32,6 +31,8 @@ interface IIntervalTask extends ITask {
   lastRunAt: number | undefined;
   totalRunCount: number;
   type: TaskType.INTERVAL;
+  startAt: number;
+  expireAt: number;
 }
 
 interface IIntervalTaskInDB extends Omit<IIntervalTask, 'callback'> {
@@ -42,6 +43,8 @@ interface ICreateIntervalTaskPayload {
   name: string;
   callback: <T>() => void | Promise<T>;
   interval: number;
+  startAt: number;
+  expireAt: number;
 }
 
 interface ITaskDatabase {
