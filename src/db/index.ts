@@ -1,1 +1,1 @@
-export * from './tasks';
+export { default as TaskDatabase } from './tasks';
