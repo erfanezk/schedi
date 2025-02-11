@@ -2,7 +2,7 @@
   "version": "0.0.0",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "test": "jest --passWithNoTests --coverage",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "lint:fix": "eslint . --ext .ts --fix"
   },
