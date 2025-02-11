@@ -5,17 +5,23 @@ import {
   IOnceTimeTask,
   ITaskDatabase,
 } from '@/interfaces';
-import { taskDatabase } from '@/db';
+import { TaskDatabase } from '@/db';
 
 type ErrorHandler = (error: unknown) => void;
 
-class TaskService implements ITaskDatabase {
+class TaskDatabaseService implements ITaskDatabase {
+  private taskDatabase: TaskDatabase;
+
+  constructor() {
+    this.taskDatabase = new TaskDatabase();
+  }
+
   async addCronTask(
     task: Omit<ICronTask, 'id'>,
     onError?: ErrorHandler,
   ): Promise<ICronTask | undefined> {
     try {
-      return await taskDatabase.addCronTask(task);
+      return await this.taskDatabase.addCronTask(task);
     } catch (error) {
       this.logError('addCronTask', error);
       onError?.(error);
@@ -28,7 +34,7 @@ class TaskService implements ITaskDatabase {
     onError?: ErrorHandler,
   ): Promise<IIntervalTask | undefined> {
     try {
-      return await taskDatabase.addIntervalTask(task);
+      return await this.taskDatabase.addIntervalTask(task);
     } catch (error) {
       this.logError('addIntervalTask', error);
       onError?.(error);
@@ -41,7 +47,7 @@ class TaskService implements ITaskDatabase {
     onError?: ErrorHandler,
   ): Promise<IOnceTimeTask | undefined> {
     try {
-      return await taskDatabase.addOnceTimeTask(task);
+      return await this.taskDatabase.addOnceTimeTask(task);
     } catch (error) {
       this.logError('addOnceTimeTask', error);
       onError?.(error);
@@ -51,7 +57,7 @@ class TaskService implements ITaskDatabase {
 
   async getAllCronTasks(onError?: ErrorHandler): Promise<ICronTask[] | undefined> {
     try {
-      return await taskDatabase.getAllCronTasks();
+      return await this.taskDatabase.getAllCronTasks();
     } catch (error) {
       this.logError('getAllCronTasks', error);
       onError?.(error);
@@ -61,7 +67,7 @@ class TaskService implements ITaskDatabase {
 
   async getAllIntervalTasks(onError?: ErrorHandler): Promise<IIntervalTask[] | undefined> {
     try {
-      return await taskDatabase.getAllIntervalTasks();
+      return await this.taskDatabase.getAllIntervalTasks();
     } catch (error) {
       this.logError('getAllIntervalTasks', error);
       onError?.(error);
@@ -71,7 +77,7 @@ class TaskService implements ITaskDatabase {
 
   async getAllOnceTimeTasks(onError?: ErrorHandler): Promise<IOnceTimeTask[] | undefined> {
     try {
-      return await taskDatabase.getAllOnceTimeTasks();
+      return await this.taskDatabase.getAllOnceTimeTasks();
     } catch (error) {
       this.logError('getAllOnceTimeTasks', error);
       onError?.(error);
@@ -81,7 +87,7 @@ class TaskService implements ITaskDatabase {
 
   async deleteCronTask(id: string, onError?: ErrorHandler): Promise<void> {
     try {
-      await taskDatabase.deleteCronTask(id);
+      await this.taskDatabase.deleteCronTask(id);
     } catch (error) {
       this.logError('deleteCronTask', error, id);
       onError?.(error);
@@ -90,7 +96,7 @@ class TaskService implements ITaskDatabase {
 
   async deleteIntervalTask(id: string, onError?: ErrorHandler): Promise<void> {
     try {
-      await taskDatabase.deleteIntervalTask(id);
+      await this.taskDatabase.deleteIntervalTask(id);
     } catch (error) {
       this.logError('deleteIntervalTask', error, id);
       onError?.(error);
@@ -99,7 +105,7 @@ class TaskService implements ITaskDatabase {
 
   async deleteOnceTimeTask(id: string, onError?: ErrorHandler): Promise<void> {
     try {
-      await taskDatabase.deleteOnceTimeTask(id);
+      await this.taskDatabase.deleteOnceTimeTask(id);
     } catch (error) {
       this.logError('deleteOnceTimeTask', error, id);
       onError?.(error);
@@ -108,7 +114,7 @@ class TaskService implements ITaskDatabase {
 
   async getCronTaskById(id: string, onError?: ErrorHandler): Promise<ICronTask | undefined> {
     try {
-      return await taskDatabase.getCronTaskById(id);
+      return await this.taskDatabase.getCronTaskById(id);
     } catch (error) {
       this.logError('getCronTaskById', error, id);
       onError?.(error);
@@ -121,7 +127,7 @@ class TaskService implements ITaskDatabase {
     onError?: ErrorHandler,
   ): Promise<IIntervalTask | undefined> {
     try {
-      return await taskDatabase.getIntervalTaskById(id);
+      return await this.taskDatabase.getIntervalTaskById(id);
     } catch (error) {
       this.logError('getIntervalTaskById', error, id);
       onError?.(error);
@@ -134,7 +140,7 @@ class TaskService implements ITaskDatabase {
     onError?: ErrorHandler,
   ): Promise<IOnceTimeTask | undefined> {
     try {
-      return await taskDatabase.getOnceTimeTaskById(id);
+      return await this.taskDatabase.getOnceTimeTaskById(id);
     } catch (error) {
       this.logError('getOnceTimeTaskById', error, id);
       onError?.(error);
@@ -148,7 +154,7 @@ class TaskService implements ITaskDatabase {
     onError?: ErrorHandler,
   ): Promise<void> {
     try {
-      await taskDatabase.updateCronTask(id, updates);
+      await this.taskDatabase.updateCronTask(id, updates);
     } catch (error) {
       this.logError('updateCronTask', error, id);
       onError?.(error);
@@ -162,7 +168,7 @@ class TaskService implements ITaskDatabase {
     onError?: ErrorHandler,
   ): Promise<void> {
     try {
-      await taskDatabase.updateIntervalTask(id, updates);
+      await this.taskDatabase.updateIntervalTask(id, updates);
     } catch (error) {
       this.logError('updateIntervalTask', error, id);
       onError?.(error);
@@ -172,7 +178,7 @@ class TaskService implements ITaskDatabase {
 
   async clearAllIntervalTasks(onError?: ErrorHandler): Promise<void> {
     try {
-      await taskDatabase.clearAllIntervalTasks();
+      await this.taskDatabase.clearAllIntervalTasks();
     } catch (error) {
       this.logError('clearAllIntervalTasks', error);
       onError?.(error);
@@ -185,7 +191,7 @@ class TaskService implements ITaskDatabase {
     onError?: ErrorHandler,
   ): Promise<void> {
     try {
-      await taskDatabase.updateOnceTimeTask(id, updates);
+      await this.taskDatabase.updateOnceTimeTask(id, updates);
     } catch (error) {
       this.logError('updateOnceTimeTask', error, id);
       onError?.(error);
@@ -201,6 +207,4 @@ class TaskService implements ITaskDatabase {
   }
 }
 
-const taskService = new TaskService();
-
-export default taskService;
+export default TaskDatabaseService;
