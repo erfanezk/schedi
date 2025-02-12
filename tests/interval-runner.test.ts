@@ -53,7 +53,7 @@ describe('Interval task runner', () => {
       name: 'Mock Task 1',
       startAt: Date.now(),
       interval: 500,
-      callback: jest.fn(),
+      callback: () => {},
       expireAt: Date.now() - secondsToMilliseconds(1),
     };
     await databaseService.addIntervalTask(mock);
