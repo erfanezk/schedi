@@ -4,7 +4,8 @@
     "lint": "eslint . --ext .ts",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "lint:fix": "eslint . --ext .ts --fix",
+    "build": "tsup"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
@@ -27,10 +28,12 @@
     "prettier": "^3.4.2",
     "pretty-quick": "^4.0.0",
     "ts-jest": "^29.2.5",
+    "tsup": "^8.3.6",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.23.0"
   },
   "dependencies": {
+    "@rollup/plugin-typescript": "^12.1.2",
     "core-js": "^3.40.0",
     "dexie": "^4.0.11",
     "uuid": "^11.0.5"
