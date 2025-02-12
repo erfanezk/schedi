@@ -1,2 +1,2 @@
-require('core-js/stable/structured-clone');
-require('fake-indexeddb/auto');
+import 'fake-indexeddb/auto';
+import 'core-js/stable/structured-clone';
