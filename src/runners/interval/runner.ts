@@ -19,6 +19,10 @@ class IntervalTaskRunner {
     return this.timerManager.timers;
   }
 
+  get tasks() {
+    return this.intervalTasks;
+  }
+
   static isTaskReadyToStart(task: IIntervalTask): boolean {
     return !task.startAt || task.startAt <= Date.now();
   }
@@ -43,10 +47,6 @@ class IntervalTaskRunner {
       clearInterval(this.periodicCheckTimer);
       this.periodicCheckTimer = null;
     }
-  }
-
-  getTasks(): IIntervalTask[] {
-    return this.intervalTasks;
   }
 
   async deleteExpiredTask(taskId: string) {
@@ -86,9 +86,10 @@ class IntervalTaskRunner {
     } // Prevent multiple intervals
 
     this.periodicCheckTimer = window.setInterval(async () => {
-      for (const task of this.intervalTasks) {
+      for (let i = 0; i < this.intervalTasks.length; i++) {
+        const task = this.intervalTasks[i];
+
         if (IntervalTaskRunner.isTaskExpired(task)) {
-          console.log('expired', task);
           this.timerManager.stopTimer(task.id);
 
           this.deleteExpiredTask(task.id);

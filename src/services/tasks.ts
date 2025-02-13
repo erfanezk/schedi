@@ -4,10 +4,8 @@ import { TaskDatabase } from '@/db';
 type ErrorHandler = (error: unknown) => void;
 
 class TaskDatabaseService implements ITaskDatabase {
-  private taskDatabase: TaskDatabase;
-
-  constructor() {
-    this.taskDatabase = new TaskDatabase();
+  constructor(private taskDatabase: TaskDatabase) {
+    this.taskDatabase = taskDatabase;
   }
 
   async addIntervalTask(

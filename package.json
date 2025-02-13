@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "lint:fix": "eslint . --ext .ts --fix",
     "build": "webpack",
