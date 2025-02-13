@@ -1,6 +1,6 @@
-import TaskService from '@/services/tasks';
 import { ICreateIntervalTaskPayload } from '@/interfaces';
 import { TaskDatabaseService } from '@/services';
+import { TaskDatabase } from '@/db';
 
 const mockTask1: ICreateIntervalTaskPayload = {
   name: 'Mock Task 1',
@@ -13,7 +13,8 @@ const mockTask1: ICreateIntervalTaskPayload = {
 describe('TaskService', () => {
   describe('Interval database', () => {
     test('should add task to db', async () => {
-      const databaseService = new TaskDatabaseService();
+      const taskDatabase = new TaskDatabase();
+      const databaseService = new TaskDatabaseService(taskDatabase);
 
       const createdTask = await databaseService.addIntervalTask(mockTask1);
       const intervals = await databaseService.getAllIntervalTasks();
@@ -23,17 +24,19 @@ describe('TaskService', () => {
     });
 
     test('should clear all tasks', async () => {
-      const taskService = new TaskService();
-      await taskService.addIntervalTask(mockTask1);
-      await taskService.addIntervalTask(mockTask1);
-      await taskService.clearAllIntervalTasks();
-      const intervals = await taskService.getAllIntervalTasks();
+      const taskDatabase = new TaskDatabase();
+      const databaseService = new TaskDatabaseService(taskDatabase);
+      await databaseService.addIntervalTask(mockTask1);
+      await databaseService.addIntervalTask(mockTask1);
+      await databaseService.clearAllIntervalTasks();
+      const intervals = await databaseService.getAllIntervalTasks();
 
       expect(intervals?.length).toBe(0);
     });
 
     test('should delete task', async () => {
-      const databaseService = new TaskDatabaseService();
+      const taskDatabase = new TaskDatabase();
+      const databaseService = new TaskDatabaseService(taskDatabase);
 
       const addedTask = await databaseService.addIntervalTask(mockTask1);
       if (addedTask) {
@@ -46,7 +49,8 @@ describe('TaskService', () => {
     });
 
     test('should update task', async () => {
-      const databaseService = new TaskDatabaseService();
+      const taskDatabase = new TaskDatabase();
+      const databaseService = new TaskDatabaseService(taskDatabase);
 
       const addedTask = await databaseService.addIntervalTask(mockTask1);
       if (addedTask) {
