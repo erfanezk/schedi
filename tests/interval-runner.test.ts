@@ -58,14 +58,12 @@ describe('Interval task runner', () => {
     expect(tasks?.length).toBe(0);
   });
 
-  it('should run task once when adding to db', async () => {
+  it('should execute the task callback 4 times within 2 seconds', async () => {
     const mockCallback = jest.fn();
     const mockTask: ICreateIntervalTaskPayload = {
       startAt: Date.now(),
       interval: 500,
-      callback: () => {
-        console.log('444');
-      },
+      callback: () => {},
       expireAt: Date.now() + secondsToMilliseconds(10),
       name: 'task-1',
     };
@@ -77,6 +75,6 @@ describe('Interval task runner', () => {
 
     jest.advanceTimersByTime(2000);
 
-    expect(mockCallback).toHaveBeenCalled();
+    expect(mockCallback).toHaveBeenCalledTimes(4);
   });
 });
