@@ -1,145 +1,84 @@
-import IntervalTimerManager from '@/runners/interval/timer-manager';
-import { TaskDatabaseService } from '@/services';
-import { IIntervalTask } from '@/interfaces';
-import { liveQuery } from 'dexie';
+import { ICreateIntervalTaskPayload, IIntervalTask } from '@/interfaces';
+import { CommonUtils } from '@/utils';
 
 class IntervalTaskRunner {
-  private timerManager: IntervalTimerManager;
+  tasks: IIntervalTask[];
+  private taskTimeouts: Map<string, number> = new Map(); // Map taskId -> timeoutId
 
-  private intervalTasks: IIntervalTask[] = [];
-  private periodicCheckTimer: number | null = null;
-  private intervalChecker: number;
-
-  constructor(private taskDatabaseService: TaskDatabaseService) {
-    this.timerManager = new IntervalTimerManager(taskDatabaseService);
-    this.intervalChecker = 1000;
+  constructor(tasks: IIntervalTask[]) {
+    this.tasks = tasks;
   }
 
-  get timers() {
-    return this.timerManager.timers;
-  }
-
-  get tasks() {
-    return this.intervalTasks;
-  }
-
-  static isTaskReadyToStart(task: IIntervalTask): boolean {
-    return !task.startAt || task.startAt <= Date.now();
-  }
-
-  static isTaskExpired(task: IIntervalTask): boolean {
-    return task.expireAt <= Date.now();
-  }
-
-  async start() {
-    try {
-      await this.syncTasksFromDB();
-      this.listenToTaskChanges();
-      this.startPeriodicCheck();
-    } catch (error) {
-      console.error('❌ IntervalTaskRunner failed to start:', error);
-    }
-  }
-
-  stopAllTasks() {
-    this.timerManager.stopAllTimers();
-    if (this.periodicCheckTimer) {
-      clearInterval(this.periodicCheckTimer);
-      this.periodicCheckTimer = null;
-    }
-  }
-
-  async deleteExpiredTask(taskId: string) {
-    try {
-      this.intervalTasks = this.intervalTasks.filter((task) => task.id !== taskId);
-      await this.taskDatabaseService.deleteIntervalTask(taskId);
-      this.updateIntervalChecker();
-    } catch (error) {
-      console.error(`❌ Error deleting task ${taskId}:`, error);
-    }
-  }
-
-  private listenToTaskChanges() {
-    liveQuery(() => this.taskDatabaseService.getAllIntervalTasks()).subscribe({
-      next: (tasks) => {
-        this.intervalTasks = tasks ?? [];
-        this.syncTasks();
-        this.updateIntervalChecker();
-      },
-      error: (err) => console.error('❌ Error listening to task changes:', err),
+  start(): () => void {
+    this.tasks.forEach((task) => {
+      this.tryScheduleTask(task);
     });
+
+    return () => this.stopAllTasks();
   }
 
-  private async syncTasksFromDB() {
-    try {
-      this.intervalTasks = (await this.taskDatabaseService.getAllIntervalTasks()) ?? [];
-      this.syncTasks();
-      this.updateIntervalChecker();
-    } catch (error) {
-      console.error('❌ Error syncing tasks from database:', error);
+  stopAllTasks(): void {
+    this.taskTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+    this.taskTimeouts.clear();
+  }
+
+  addTask(_task: ICreateIntervalTaskPayload) {
+    const creationTime = Date.now();
+    const task: IIntervalTask = {
+      ..._task,
+      callback: _task.callback,
+      id: CommonUtils.generateUniqueId(),
+      createdAt: creationTime,
+      lastRunAt: undefined,
+      totalRunCount: 0,
+      enabled: _task.enabled ?? true,
+    };
+
+    this.tasks.push(task);
+    this.tryScheduleTask(task);
+  }
+
+  stopTask(taskId: string): void {
+    const timeoutId = this.taskTimeouts.get(taskId);
+    const task = this.tasks.find((task) => task.id === taskId);
+    if (timeoutId !== undefined && task) {
+      clearTimeout(timeoutId);
+      this.taskTimeouts.delete(taskId);
+      task.enabled = false;
     }
   }
 
-  private startPeriodicCheck() {
-    if (this.periodicCheckTimer) {
-      return;
-    } // Prevent multiple intervals
+  private tryScheduleTask(task: IIntervalTask): void {
+    if (!this.isTaskExpired(task) && task.enabled) {
+      this.scheduleTask(task);
+    }
+  }
 
-    this.periodicCheckTimer = window.setInterval(async () => {
-      for (let i = 0; i < this.intervalTasks.length; i++) {
-        const task = this.intervalTasks[i];
+  private scheduleTask(task: IIntervalTask): void {
+    const timeout = task.startAt > Date.now() ? task.startAt - Date.now() : task.interval;
 
-        if (IntervalTaskRunner.isTaskExpired(task)) {
-          this.timerManager.stopTimer(task.id);
-
-          this.deleteExpiredTask(task.id);
-        } else if (
-          IntervalTaskRunner.isTaskReadyToStart(task) &&
-          !this.timerManager.isTimerRunning(task.id)
-        ) {
-          this.timerManager.startTimer(task);
-        }
+    const timeoutId = window.setTimeout(() => {
+      if (this.isTaskExpired(task)) {
+        this.removeTask(task.id);
+        return;
       }
-    }, this.intervalChecker);
+
+      task.callback();
+      task.lastRunAt = Date.now();
+      task.totalRunCount += 1;
+      this.scheduleTask(task);
+    }, timeout);
+
+    this.taskTimeouts.set(task.id, timeoutId);
   }
 
-  private syncTasks() {
-    const runningTimers = this.timerManager.getRunningTimers();
-
-    for (const taskId of runningTimers) {
-      if (!this.intervalTasks.some((task) => task.id === taskId)) {
-        this.timerManager.stopTimer(taskId);
-      }
-    }
-
-    for (const task of this.intervalTasks) {
-      if (
-        IntervalTaskRunner.isTaskReadyToStart(task) &&
-        !this.timerManager.isTimerRunning(task.id)
-      ) {
-        this.timerManager.startTimer(task);
-      }
-    }
+  private removeTask(taskId: string): void {
+    this.stopTask(taskId);
+    this.tasks = this.tasks.filter((task) => task.id !== taskId);
   }
 
-  private updateIntervalChecker() {
-    const intervals = this.intervalTasks
-      .map((task) => task.interval)
-      .filter((interval) => interval != null);
-
-    if (intervals.length > 0) {
-      this.intervalChecker = Math.min(...intervals);
-      this.restartPeriodicCheck();
-    }
-  }
-
-  private restartPeriodicCheck() {
-    if (this.periodicCheckTimer) {
-      clearInterval(this.periodicCheckTimer);
-      this.periodicCheckTimer = null;
-    }
-
-    this.startPeriodicCheck();
+  private isTaskExpired(task: IIntervalTask): boolean {
+    return task.expireAt < Date.now();
   }
 }
 
