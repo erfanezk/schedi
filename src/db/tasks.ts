@@ -4,7 +4,6 @@ import {
   IIntervalTask,
   IIntervalTaskInDB,
   ITaskDatabase,
-  TaskType,
 } from '@/interfaces';
 import { CommonUtils } from '@/utils';
 import functionSerializer from '@/utils/function';
@@ -33,7 +32,7 @@ class TaskDatabase extends Dexie implements ITaskDatabase {
       createdAt: creationTime,
       lastRunAt: undefined,
       totalRunCount: 0,
-      type: TaskType.INTERVAL,
+      enabled: false,
     };
     await this.intervalTasks.add({
       ...task,
