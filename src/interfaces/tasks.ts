@@ -8,15 +8,14 @@ interface ITask {
   id: string;
   name: string;
   createdAt: number;
-  type: TaskType;
   callback: ICallback;
+  enabled: boolean;
 }
 
 interface IIntervalTask extends ITask {
   interval: number;
   lastRunAt: number | undefined;
   totalRunCount: number;
-  type: TaskType.INTERVAL;
   startAt: number;
   expireAt: number;
 }
@@ -31,6 +30,7 @@ interface ICreateIntervalTaskPayload {
   interval: number;
   startAt: number;
   expireAt: number;
+  enabled?: boolean;
 }
 
 interface ITaskDatabase {
