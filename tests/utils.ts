@@ -10,7 +10,7 @@ const generateMockTask = (overrides: Partial<IIntervalTask> = {}): IIntervalTask
   id: `task-${Math.random()}`,
   interval: 1000,
   startAt: Date.now(),
-  expireAt: Date.now() + secondsToMilliseconds(100),
+  expireAt: Infinity,
   callback: jest.fn(),
   name: 'task',
   createdAt: Date.now(),

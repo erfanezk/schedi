@@ -195,7 +195,10 @@ describe('Interval task runner', () => {
 
   it('should handle tasks with very long intervals', () => {
     // given
-    const task = generateMockTask({ interval: 60000 }); // 1-minute interval
+    const task = generateMockTask({
+      interval: 60000,
+      expireAt: Date.now() + secondsToMilliseconds(130),
+    }); // 1-minute interval
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -280,5 +283,42 @@ describe('Interval task runner', () => {
 
     // then
     expect(task.callback).not.toHaveBeenCalled();
+  });
+
+  it('should not execute a stopped task again', () => {
+    // given
+    const task = generateMockTask({ interval: 1000 });
+    const taskRunner = new IntervalTaskRunner([task]);
+
+    // when
+    taskRunner.start();
+    jest.advanceTimersByTime(1000);
+    taskRunner.stopTask(task.id);
+    jest.advanceTimersByTime(3000);
+
+    // then
+    expect(task.callback).toHaveBeenCalledTimes(1);
+  });
+
+  it('should schedule tasks far in the future correctly', () => {
+    // given
+    const task = generateMockTask({
+      startAt: Date.now() + 60000,
+      interval: 1000,
+    });
+    const taskRunner = new IntervalTaskRunner([task]);
+
+    // when
+    taskRunner.start();
+    jest.advanceTimersByTime(59000);
+
+    // then
+    expect(task.callback).not.toHaveBeenCalled();
+
+    // when
+    jest.advanceTimersByTime(2000);
+
+    // then
+    expect(task.callback).toHaveBeenCalledTimes(1);
   });
 });
