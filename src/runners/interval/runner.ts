@@ -50,8 +50,6 @@ class IntervalTaskRunner {
   private scheduleTaskForFuture(task: IIntervalTask): void {
     const delay = Math.max(0, task.startAt - Date.now());
 
-    console.log(`Task "${task.id}" scheduled to start in ${delay}ms`);
-
     const timeoutId = window.setTimeout(() => {
       this.startInterval(task);
     }, delay);
@@ -66,7 +64,6 @@ class IntervalTaskRunner {
 
   private executeTask(task: IIntervalTask): void {
     if (this.isTaskExpired(task)) {
-      console.log('task expired');
       this.removeTask(task.id);
       return;
     }
