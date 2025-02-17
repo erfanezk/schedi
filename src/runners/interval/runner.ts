@@ -1,75 +1,91 @@
-import { ICreateIntervalTaskPayload, IIntervalTask } from '@/interfaces';
-import { CommonUtils } from '@/utils';
+import { IIntervalTask } from '@/interfaces';
 
 class IntervalTaskRunner {
-  tasks: IIntervalTask[];
-  private taskTimeouts: Map<string, number> = new Map(); // Map taskId -> timeoutId
+  private taskIntervals: Map<string, number> = new Map(); // Stores active intervals
 
-  constructor(tasks: IIntervalTask[]) {
+  constructor(private tasks: IIntervalTask[]) {
     this.tasks = tasks;
   }
 
   start(): () => void {
-    this.tasks.forEach((task) => {
-      this.tryScheduleTask(task);
-    });
-
+    this.tasks.forEach((task) => this.scheduleTask(task));
     return () => this.stopAllTasks();
   }
 
-  stopAllTasks(): void {
-    this.taskTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
-    this.taskTimeouts.clear();
-  }
-
-  addTask(_task: ICreateIntervalTaskPayload) {
-    const creationTime = Date.now();
-    const task: IIntervalTask = {
-      ..._task,
-      callback: _task.callback,
-      id: CommonUtils.generateUniqueId(),
-      createdAt: creationTime,
-      lastRunAt: undefined,
-      totalRunCount: 0,
-      enabled: _task.enabled ?? true,
-    };
-
-    this.tasks.push(task);
-    this.tryScheduleTask(task);
-  }
-
   stopTask(taskId: string): void {
-    const timeoutId = this.taskTimeouts.get(taskId);
-    const task = this.tasks.find((task) => task.id === taskId);
-    if (timeoutId !== undefined && task) {
-      clearTimeout(timeoutId);
-      this.taskTimeouts.delete(taskId);
+    if (!this.taskIntervals.has(taskId)) {
+      return;
+    }
+
+    clearInterval(this.taskIntervals.get(taskId)!);
+    this.taskIntervals.delete(taskId);
+
+    const task = this.getTaskById(taskId);
+    if (task) {
       task.enabled = false;
     }
   }
 
-  private tryScheduleTask(task: IIntervalTask): void {
-    if (!this.isTaskExpired(task) && task.enabled) {
-      this.scheduleTask(task);
-    }
+  stopAllTasks(): void {
+    this.taskIntervals.forEach((intervalId) => clearInterval(intervalId));
+    this.taskIntervals.clear();
   }
 
   private scheduleTask(task: IIntervalTask): void {
-    const timeout = task.startAt > Date.now() ? task.startAt - Date.now() : task.interval;
+    if (this.isTaskExpired(task) || !task.enabled) {
+      return;
+    }
+
+    if (this.isTaskScheduled(task)) {
+      return;
+    } // Prevent duplicate scheduling
+
+    if (this.isTaskForFuture(task)) {
+      this.scheduleTaskForFuture(task);
+    } else {
+      this.startInterval(task);
+    }
+  }
+
+  private scheduleTaskForFuture(task: IIntervalTask): void {
+    const delay = Math.max(0, task.startAt - Date.now());
+
+    console.log(`Task "${task.id}" scheduled to start in ${delay}ms`);
 
     const timeoutId = window.setTimeout(() => {
-      if (this.isTaskExpired(task)) {
-        this.removeTask(task.id);
-        return;
-      }
+      this.startInterval(task);
+    }, delay);
 
-      task.callback();
-      task.lastRunAt = Date.now();
-      task.totalRunCount += 1;
-      this.scheduleTask(task);
-    }, timeout);
+    this.taskIntervals.set(task.id, timeoutId);
+  }
 
-    this.taskTimeouts.set(task.id, timeoutId);
+  private startInterval(task: IIntervalTask): void {
+    const intervalId = window.setInterval(() => this.executeTask(task), task.interval);
+    this.taskIntervals.set(task.id, intervalId);
+  }
+
+  private executeTask(task: IIntervalTask): void {
+    if (this.isTaskExpired(task)) {
+      console.log('task expired');
+      this.removeTask(task.id);
+      return;
+    }
+
+    task.callback();
+    task.lastRunAt = Date.now();
+    task.totalRunCount += 1;
+  }
+
+  private isTaskScheduled(task: IIntervalTask): boolean {
+    return this.taskIntervals.has(task.id);
+  }
+
+  private isTaskForFuture(task: IIntervalTask): boolean {
+    return task.startAt > Date.now();
+  }
+
+  private getTaskById(taskId: string): IIntervalTask | undefined {
+    return this.tasks.find((task) => task.id === taskId);
   }
 
   private removeTask(taskId: string): void {
