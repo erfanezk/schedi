@@ -12,6 +12,11 @@ interface ITask {
   enabled: boolean;
 }
 
+interface IOneTimeTask extends ITask {
+  expireAt: number;
+  startAt: number;
+}
+
 interface IIntervalTask extends ITask {
   interval: number;
   lastRunAt: number | undefined;
@@ -54,6 +59,7 @@ export type {
   ICreateIntervalTaskPayload,
   IIntervalTaskInDB,
   ICallback,
+  IOneTimeTask,
 };
 
 export { TaskType };
