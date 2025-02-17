@@ -1,7 +1,3 @@
-enum TaskType {
-  INTERVAL = 'interval',
-}
-
 type ICallback = <T>() => void | Promise<T>;
 
 interface ITask {
@@ -38,28 +34,11 @@ interface ICreateIntervalTaskPayload {
   enabled?: boolean;
 }
 
-interface ITaskDatabase {
-  addIntervalTask(task: Omit<IIntervalTask, 'id'>): Promise<IIntervalTask | undefined>;
-
-  getAllIntervalTasks(): Promise<IIntervalTask[] | undefined>;
-
-  getIntervalTaskById(id: string): Promise<IIntervalTask | undefined>;
-
-  updateIntervalTask(id: string, updates: Partial<IIntervalTask>): Promise<void>;
-
-  deleteIntervalTask(id: string): Promise<void>;
-
-  clearAllIntervalTasks(): Promise<void>;
-}
-
 export type {
   ITask,
-  ITaskDatabase,
   IIntervalTask,
   ICreateIntervalTaskPayload,
   IIntervalTaskInDB,
   ICallback,
   IOneTimeTask,
 };
-
-export { TaskType };

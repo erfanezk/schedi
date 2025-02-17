@@ -1,5 +1,6 @@
-import { IntervalTaskRunner } from '@/runners';
+import { IntervalTaskRunner, OneTimeTaskRunner } from '@/runners';
 
-const schedulify = new IntervalTaskRunner([]);
+const intervalRunner = new IntervalTaskRunner([]);
+const schedulify = new OneTimeTaskRunner([]);
 
-export { schedulify };
+export { schedulify, intervalRunner };

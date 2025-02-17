@@ -38,7 +38,7 @@ class IntervalTaskRunner {
 
     if (this.isTaskScheduled(task)) {
       return;
-    } // Prevent duplicate scheduling
+    }
 
     if (this.isTaskForFuture(task)) {
       this.scheduleTaskForFuture(task);
