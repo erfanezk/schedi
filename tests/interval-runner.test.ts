@@ -1,5 +1,5 @@
 import { IntervalTaskRunner } from '@/runners';
-import { generateMockTask, secondsToMilliseconds } from './utils';
+import { generateIntervalMockTask, secondsToMilliseconds } from './utils';
 
 describe('Interval task runner', () => {
   const now = new Date();
@@ -15,7 +15,7 @@ describe('Interval task runner', () => {
 
   it('should start tasks at minimum interval', () => {
     // given
-    const task = generateMockTask();
+    const task = generateIntervalMockTask();
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -28,7 +28,7 @@ describe('Interval task runner', () => {
 
   it('should not run tasks before startAt', () => {
     // given
-    const task = generateMockTask({ startAt: Date.now() + 2000 });
+    const task = generateIntervalMockTask({ startAt: Date.now() + 2000 });
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -41,7 +41,7 @@ describe('Interval task runner', () => {
 
   it('should start task after 2 sec', () => {
     // given
-    const task = generateMockTask({ startAt: Date.now() + 2000 });
+    const task = generateIntervalMockTask({ startAt: Date.now() + 2000 });
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -54,7 +54,7 @@ describe('Interval task runner', () => {
 
   it('should remove expired tasks', () => {
     // given
-    const task = generateMockTask({ expireAt: Date.now() + secondsToMilliseconds(2) });
+    const task = generateIntervalMockTask({ expireAt: Date.now() + secondsToMilliseconds(2) });
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -67,7 +67,7 @@ describe('Interval task runner', () => {
 
   it('should stop all tasks', () => {
     // given
-    const task = generateMockTask({ interval: 1000 });
+    const task = generateIntervalMockTask({ interval: 1000 });
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -82,8 +82,8 @@ describe('Interval task runner', () => {
 
   it('should stop a specific task', () => {
     // given
-    const task1 = generateMockTask({ id: 'task-1' });
-    const task2 = generateMockTask({ id: 'task-2' });
+    const task1 = generateIntervalMockTask({ id: 'task-1' });
+    const task2 = generateIntervalMockTask({ id: 'task-2' });
     const taskRunner = new IntervalTaskRunner([task1, task2]);
 
     // when
@@ -99,7 +99,7 @@ describe('Interval task runner', () => {
 
   it('should execute a single task periodically until expiration', () => {
     // given
-    const task = generateMockTask();
+    const task = generateIntervalMockTask();
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -112,8 +112,8 @@ describe('Interval task runner', () => {
 
   it('should handle multiple tasks with different intervals', () => {
     // given
-    const task1 = generateMockTask({ interval: 1000 });
-    const task2 = generateMockTask({ interval: 2000 });
+    const task1 = generateIntervalMockTask({ interval: 1000 });
+    const task2 = generateIntervalMockTask({ interval: 2000 });
     const taskRunner = new IntervalTaskRunner([task1, task2]);
 
     // when
@@ -127,7 +127,7 @@ describe('Interval task runner', () => {
 
   it('should handle tasks with intervals greater than expiration time', () => {
     // given
-    const task = generateMockTask({ interval: 6000, expireAt: Date.now() + 5000 });
+    const task = generateIntervalMockTask({ interval: 6000, expireAt: Date.now() + 5000 });
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -140,7 +140,7 @@ describe('Interval task runner', () => {
 
   it('should not run tasks that expire immediately', () => {
     // given
-    const task = generateMockTask({ startAt: Date.now(), expireAt: Date.now() });
+    const task = generateIntervalMockTask({ startAt: Date.now(), expireAt: Date.now() });
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -153,7 +153,7 @@ describe('Interval task runner', () => {
 
   it('should not execute tasks already expired', () => {
     // given
-    const task = generateMockTask({ expireAt: Date.now() - 1000 });
+    const task = generateIntervalMockTask({ expireAt: Date.now() - 1000 });
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -166,7 +166,7 @@ describe('Interval task runner', () => {
 
   it('should not run disabled tasks', () => {
     // given
-    const task = generateMockTask({ enabled: false });
+    const task = generateIntervalMockTask({ enabled: false });
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -179,7 +179,7 @@ describe('Interval task runner', () => {
 
   it('should handle tasks with long execution times', () => {
     // given
-    const task = generateMockTask({
+    const task = generateIntervalMockTask({
       callback: jest.fn(() => jest.advanceTimersByTime(200)), // Simulate long execution
       interval: 1000,
     });
@@ -195,7 +195,7 @@ describe('Interval task runner', () => {
 
   it('should handle tasks with very long intervals', () => {
     // given
-    const task = generateMockTask({
+    const task = generateIntervalMockTask({
       interval: 60000,
       expireAt: Date.now() + secondsToMilliseconds(130),
     }); // 1-minute interval
@@ -212,7 +212,7 @@ describe('Interval task runner', () => {
   it('should handle a large number of tasks efficiently', () => {
     // given
     const tasks = Array.from({ length: 100 }, (_, i) =>
-      generateMockTask({ id: `task-${i}`, interval: 1000 + i * 10 }),
+      generateIntervalMockTask({ id: `task-${i}`, interval: 1000 + i * 10 }),
     );
     const taskRunner = new IntervalTaskRunner(tasks);
 
@@ -229,8 +229,8 @@ describe('Interval task runner', () => {
 
   it('should handle overlapping task intervals correctly', () => {
     // given
-    const task1 = generateMockTask({ interval: 1000 });
-    const task2 = generateMockTask({ interval: 500 });
+    const task1 = generateIntervalMockTask({ interval: 1000 });
+    const task2 = generateIntervalMockTask({ interval: 500 });
     const taskRunner = new IntervalTaskRunner([task1, task2]);
 
     // when
@@ -244,8 +244,8 @@ describe('Interval task runner', () => {
 
   it('should handle multiple tasks starting at the same time', () => {
     // given
-    const task1 = generateMockTask({ startAt: Date.now() });
-    const task2 = generateMockTask({ startAt: Date.now() });
+    const task1 = generateIntervalMockTask({ startAt: Date.now() });
+    const task2 = generateIntervalMockTask({ startAt: Date.now() });
     const taskRunner = new IntervalTaskRunner([task1, task2]);
 
     // when
@@ -259,7 +259,7 @@ describe('Interval task runner', () => {
 
   it('should handle task expiration during execution', () => {
     // given
-    const task = generateMockTask({ expireAt: Date.now() + 1500 });
+    const task = generateIntervalMockTask({ expireAt: Date.now() + 1500 });
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -273,7 +273,7 @@ describe('Interval task runner', () => {
 
   it('should handle tasks that are started and stopped at the same time', () => {
     // given
-    const task = generateMockTask();
+    const task = generateIntervalMockTask();
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -287,7 +287,7 @@ describe('Interval task runner', () => {
 
   it('should not execute a stopped task again', () => {
     // given
-    const task = generateMockTask({ interval: 1000 });
+    const task = generateIntervalMockTask({ interval: 1000 });
     const taskRunner = new IntervalTaskRunner([task]);
 
     // when
@@ -302,7 +302,7 @@ describe('Interval task runner', () => {
 
   it('should schedule tasks far in the future correctly', () => {
     // given
-    const task = generateMockTask({
+    const task = generateIntervalMockTask({
       startAt: Date.now() + 60000,
       interval: 1000,
     });

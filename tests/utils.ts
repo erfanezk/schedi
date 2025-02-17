@@ -1,4 +1,4 @@
-import { IIntervalTask } from '@/interfaces';
+import { IIntervalTask, IOneTimeTask } from '@/interfaces';
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -6,7 +6,7 @@ function secondsToMilliseconds(seconds: number) {
   return seconds * 1000;
 }
 
-const generateMockTask = (overrides: Partial<IIntervalTask> = {}): IIntervalTask => ({
+const generateIntervalMockTask = (overrides: Partial<IIntervalTask> = {}): IIntervalTask => ({
   id: `task-${Math.random()}`,
   interval: 1000,
   startAt: Date.now(),
@@ -20,4 +20,15 @@ const generateMockTask = (overrides: Partial<IIntervalTask> = {}): IIntervalTask
   ...overrides,
 });
 
-export { wait, secondsToMilliseconds, generateMockTask };
+const generateOneTimeMockTask = (overrides: Partial<IOneTimeTask> = {}): IOneTimeTask => ({
+  id: `task-${Math.random()}`,
+  startAt: Date.now(),
+  expireAt: Infinity,
+  callback: jest.fn(),
+  name: 'task',
+  createdAt: Date.now(),
+  enabled: true,
+  ...overrides,
+});
+
+export { wait, secondsToMilliseconds, generateOneTimeMockTask, generateIntervalMockTask };
