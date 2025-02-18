@@ -45,14 +45,11 @@
     "build": "rm -fr dist && tsc && vite build"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.8",
-    "@babel/preset-env": "^7.26.8",
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.7.1",
     "@eslint/js": "^9.19.0",
     "@jest/transform": "^29.7.0",
     "@types/jest": "^29.5.14",
-    "@types/webpack-env": "^1.18.8",
     "@typescript-eslint/eslint-plugin": "^8.23.0",
     "@typescript-eslint/parser": "^8.23.0",
     "eslint": "^9.19.0",
