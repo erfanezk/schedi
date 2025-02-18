@@ -8,6 +8,8 @@ import { CommonUtils } from '@/utils';
 class OneTimeTaskRunner {
   private taskTimeouts: Map<string, number> = new Map(); //taskId timeoutId
 
+  private isRunning = false;
+
   /**
    * Creates an instance of OneTimeTaskRunner.
    * @param {IOneTimeTask[]} tasks - List of one-time tasks to be managed.
@@ -21,6 +23,7 @@ class OneTimeTaskRunner {
    * @returns {() => void} Function to stop all scheduled tasks.
    */
   start(): () => void {
+    this.isRunning = true;
     this.tasks.forEach((task) => this.scheduleTask(task));
     return () => this.stopAllTasks();
   }
@@ -38,7 +41,9 @@ class OneTimeTaskRunner {
       enabled: data.enabled ?? true,
     };
     this.tasks.push(newTask);
-    this.scheduleTask(newTask);
+
+    if (this.isRunning) this.scheduleTask(newTask);
+
     return newTask;
   }
 

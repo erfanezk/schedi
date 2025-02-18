@@ -6,6 +6,7 @@ import { CommonUtils } from '@/utils';
  */
 class IntervalTaskRunner {
   private taskIntervals: Map<string, number> = new Map(); // Stores active intervals
+  private isRunning = false;
 
   /**
    * Creates an instance of IntervalTaskRunner.
@@ -20,6 +21,7 @@ class IntervalTaskRunner {
    * @returns {() => void} Function to stop all running tasks.
    */
   start(): () => void {
+    this.isRunning = true;
     this.tasks.forEach((task) => this.scheduleTask(task));
     return () => this.stopAllTasks();
   }
@@ -39,7 +41,9 @@ class IntervalTaskRunner {
       enabled: task.enabled ?? true,
     };
     this.tasks.push(newTask);
-    this.scheduleTask(newTask);
+
+    if (this.isRunning) this.scheduleTask(newTask);
+
     return newTask;
   }
 
