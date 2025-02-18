@@ -197,7 +197,7 @@ describe('One time task runner', () => {
 
   it('should add a new task and schedule it immediately if startAt is in the past', () => {
     // given
-    const taskRunner = new OneTimeTaskRunner([]);
+    const taskRunner = new OneTimeTaskRunner();
     const taskPayload = generateOneTimeMockTask({ startAt: Date.now() - 1000 });
 
     // when

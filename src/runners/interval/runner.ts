@@ -12,7 +12,7 @@ class IntervalTaskRunner {
    * Creates an instance of IntervalTaskRunner.
    * @param {IIntervalTask[]} tasks - An array of interval tasks to be managed.
    */
-  constructor(public tasks: IIntervalTask[]) {
+  constructor(public tasks: IIntervalTask[] = []) {
     this.tasks = tasks;
   }
 

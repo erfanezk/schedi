@@ -14,7 +14,7 @@ class OneTimeTaskRunner {
    * Creates an instance of OneTimeTaskRunner.
    * @param {IOneTimeTask[]} tasks - List of one-time tasks to be managed.
    */
-  constructor(public tasks: IOneTimeTask[]) {
+  constructor(public tasks: IOneTimeTask[] = []) {
     this.tasks = tasks;
   }
 
