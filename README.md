@@ -23,6 +23,8 @@ npm install schedulify
 ### Using IntervalTaskRunner
 
 ```typescript
+import { IntervalTaskRunner } from 'schedulify';
+
 const taskRunner = new IntervalTaskRunner([]);
 const stopTasks = taskRunner.start();
 
@@ -42,6 +44,8 @@ const task = taskRunner.addTask({
 ### Using OneTimeTaskRunner
 
 ```typescript
+import { OneTimeTaskRunner } from 'schedulify';
+
 const oneTimeRunner = new OneTimeTaskRunner([]);
 const stopOneTimeTasks = oneTimeRunner.start();
 
