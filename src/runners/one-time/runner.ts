@@ -1,4 +1,4 @@
-import { IOnceTimeTaskCreatePayload, IOneTimeTask } from '@/interfaces';
+import { IOneTimeTask, IOneTimeTaskCreatePayload } from '@/interfaces';
 import { CommonUtils } from '@/utils';
 
 /**
@@ -27,10 +27,10 @@ class OneTimeTaskRunner {
 
   /**
    * Adds a new one-time task and schedules it.
-   * @param {IOnceTimeTaskCreatePayload} data - The task configuration.
+   * @param {IOneTimeTaskCreatePayload} data - The task configuration.
    * @returns {IOneTimeTask} The newly created and scheduled task.
    */
-  addTask(data: IOnceTimeTaskCreatePayload): IOneTimeTask {
+  addTask(data: IOneTimeTaskCreatePayload): IOneTimeTask {
     const newTask: IOneTimeTask = {
       ...data,
       id: CommonUtils.generateUniqueId(),
