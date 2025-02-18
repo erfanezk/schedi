@@ -1,4 +1,4 @@
-# **Schedulify**
+# **Timelify**
 
 🚀 **A lightweight and flexible task scheduling library for JavaScript & TypeScript.**  
 Effortlessly manage **interval-based** and **one-time** tasks with precision and reliability.
@@ -21,6 +21,35 @@ Install Schedulify via npm:
 
 ```sh
 npm install timelify
+```
+
+## Import
+
+### ES Modules
+
+When using ESM:
+
+```typescript
+import { IntervalTaskRunner, OneTimeTaskRunner } from 'timelify';
+```
+
+### CommonJS
+
+When using CJS:
+
+```typescript
+const { IntervalTaskRunner, OneTimeTaskRunner } = require('timelify');
+```
+
+### Browser
+
+When using browser, include the script tag:
+
+```html
+<script src="timelify.iife.js"></script>
+<script>
+  const { IntervalTaskRunner, OneTimeTaskRunner } = timelify;
+</script>
 ```
 
 ## **Usage**
