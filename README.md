@@ -1,73 +1,117 @@
-# Schedulify
+# **Schedulify**
 
-**A lightweight and flexible task scheduling library for JavaScript & TypeScript.**  
-Easily manage **interval-based** and **one-time** tasks with precise execution control. 🚀
+🚀 **A lightweight and flexible task scheduling library for JavaScript & TypeScript.**  
+Effortlessly manage **interval-based** and **one-time** tasks with precision and reliability.
 
-## Introduction
+## **Overview**
 
-This project provides two task management utilities:
+Schedulify provides a simple yet powerful solution for handling scheduled tasks in JavaScript and TypeScript
+applications.
 
-- **IntervalTaskRunner**: Manages interval-based tasks that execute repeatedly at a fixed time interval.
-- **OneTimeTaskRunner**: Manages one-time tasks that execute once at a scheduled time and are then removed.
+### **Key Features**
 
-These classes are useful for automating scheduled task execution without manual intervention.
+✅ **Interval-based task execution** – Run tasks at fixed intervals seamlessly.  
+✅ **One-time scheduled tasks** – Schedule tasks to execute once at a specific time.  
+✅ **Automatic task management** – Add, remove, start, and stop tasks dynamically.  
+✅ **Minimal and efficient** – Designed for optimal performance with minimal overhead.
 
-## Installation
+## **Installation**
+
+Install Schedulify via npm:
 
 ```sh
 npm install schedulify
 ```
 
-## Usage
+## **Usage**
 
-### Using IntervalTaskRunner
+### **1. Managing Interval-Based Tasks** (`IntervalTaskRunner`)
+
+The `IntervalTaskRunner` schedules tasks to execute repeatedly at a fixed interval.
 
 ```typescript
 import { IntervalTaskRunner } from 'schedulify';
 
+// Initialize the task runner
 const intervalTaskRunner = new IntervalTaskRunner([]);
+
+// Start executing tasks
 const stopTasks = intervalTaskRunner.start();
 
+// Add a repeating task that runs every 5 seconds
 const task = intervalTaskRunner.addTask({
   interval: 5000,
-  callback: () => console.log('Task executed'),
+  callback: () => console.log('Repeating task executed'),
   enabled: true,
 });
 
-// To remove a task
-// taskRunner.removeTask(task.id);
+// Remove a specific task
+intervalTaskRunner.removeTask(task.id);
 
-// To stop all tasks
-// taskRunner.stopTasks();
+// Stop all running tasks
+stopTasks();
 ```
 
-### Using OneTimeTaskRunner
+### **2. Managing One-Time Tasks** (`OneTimeTaskRunner`)
+
+The `OneTimeTaskRunner` schedules tasks to execute once at a predetermined time.
 
 ```typescript
 import { OneTimeTaskRunner } from 'schedulify';
 
+// Initialize the task runner
 const oneTimeRunner = new OneTimeTaskRunner([]);
+
+// Start executing scheduled tasks
 const stopOneTimeTasks = oneTimeRunner.start();
 
+// Schedule a one-time task to run in 10 seconds
 const task = oneTimeRunner.addTask({
-  startAt: Date.now() + 10000, // 10 seconds later
+  startAt: Date.now() + 10000, // 10 seconds from now
   callback: () => console.log('One-time task executed'),
   enabled: true,
 });
 
-// To remove a task
-// oneTimeRunner.removeTask(task.id);
+// Remove a scheduled task before execution
+oneTimeRunner.removeTask(task.id);
 
-// To stop all scheduled tasks
-// oneTimeRunner.stopOneTimeTasks();
+// Stop all scheduled one-time tasks
+stopOneTimeTasks();
 ```
 
-## Configuration
+## **Task Creation Configuration**
 
-- `interval`: The time interval (in milliseconds) for repeating tasks.
-- `startAt`: The scheduled execution time for one-time tasks.
-- `callback`: The function to be executed when the task runs.
-- `enabled`: A flag indicating whether the task should be executed.
+When adding a task using the `addTask` method, you need to provide a configuration object. Below are the required
+properties for both `IntervalTaskRunner` and `OneTimeTaskRunner`.
+
+### **One-Time Task Creation**
+
+This configuration is used when adding a **one-time task**.
+
+| Property   | Type       | Required | Description                                                                   |
+| ---------- | ---------- | -------- | ----------------------------------------------------------------------------- |
+| `name`     | `string`   | ✅       | Optional name for the task.                                                   |
+| `callback` | `Function` | ✅       | Function to execute when the task runs.                                       |
+| `startAt`  | `number`   | ✅       | Timestamp (in ms) when the task should run.                                   |
+| `expireAt` | `number`   | ✅       | Timestamp (in ms) when the task expires (task won't execute after this time). |
+| `enabled`  | `boolean`  | ❌       | Indicates if the task is active (default: `true`).                            |
+
+## **Interval Task Configuration**
+
+This configuration is used when adding an **interval task**.
+
+### **🔹 Configuration Properties**
+
+| Property   | Type       | Required | Description                                                                   |
+| ---------- | ---------- | -------- | ----------------------------------------------------------------------------- |
+| `name`     | `string`   | ✅       | Optional name for the task.                                                   |
+| `callback` | `Function` | ✅       | Function to execute on each interval.                                         |
+| `startAt`  | `number`   | ✅       | Timestamp (in ms) when the task should start.                                 |
+| `expireAt` | `number`   | ✅       | Timestamp (in ms) when the task expires (task won't execute after this time). |
+| `interval` | `number`   | ✅       | Time interval (in ms) between executions.                                     |
+| `enabled`  | `boolean`  | ❌       | Indicates if the task is active (default: `true`).                            |
+
+---
 
 ## Contributing
 
@@ -81,10 +125,3 @@ Contributions are welcome! Please follow these steps:
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
-## Future Improvements
-
-- Support for pausing and resuming tasks.
-- Enhanced logging and monitoring.
-- **Persistent Task Storage**: Implement IndexedDB to store tasks and maintain state across page reloads or application
-  restarts.
