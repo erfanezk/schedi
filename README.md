@@ -25,10 +25,10 @@ npm install schedulify
 ```typescript
 import { IntervalTaskRunner } from 'schedulify';
 
-const taskRunner = new IntervalTaskRunner([]);
-const stopTasks = taskRunner.start();
+const intervalTaskRunner = new IntervalTaskRunner([]);
+const stopTasks = intervalTaskRunner.start();
 
-const task = taskRunner.addTask({
+const task = intervalTaskRunner.addTask({
   interval: 5000,
   callback: () => console.log('Task executed'),
   enabled: true,
@@ -38,7 +38,7 @@ const task = taskRunner.addTask({
 // taskRunner.removeTask(task.id);
 
 // To stop all tasks
-// stopTasks();
+// taskRunner.stopTasks();
 ```
 
 ### Using OneTimeTaskRunner
@@ -59,7 +59,7 @@ const task = oneTimeRunner.addTask({
 // oneTimeRunner.removeTask(task.id);
 
 // To stop all scheduled tasks
-// stopOneTimeTasks();
+// oneTimeRunner.stopOneTimeTasks();
 ```
 
 ## Configuration
