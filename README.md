@@ -20,7 +20,7 @@ applications.
 Install timelify via npm:
 
 ```sh
-npm install timelify
+npm install tempofy
 ```
 
 ## Import
