@@ -42,7 +42,9 @@ class IntervalTaskRunner {
     };
     this.tasks.push(newTask);
 
-    if (this.isRunning) this.scheduleTask(newTask);
+    if (this.isRunning) {
+      this.scheduleTask(newTask);
+    }
 
     return newTask;
   }
