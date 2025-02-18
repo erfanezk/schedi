@@ -16,7 +16,6 @@ const jestConfig: JestConfigWithTsJest = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  setupFilesAfterEnv: ['./tests/jest.setup.js'],
 };
 
 export default jestConfig;
