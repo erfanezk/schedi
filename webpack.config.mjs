@@ -8,17 +8,30 @@ const config = {
     filename: 'index.js', // Output filename
     libraryTarget: 'module', // Use module for ESM
     globalObject: 'this', // Ensure it works in different environments
+    clean: true, // Clean dist folder before building
+    module: true, // Enable ESM
   },
   experiments: {
     outputModule: true, // Enables ESM output
   },
-  mode: 'development', // Use "development" during development
+  mode: 'production', // Use "development" during development
   module: {
     rules: [
       {
         test: /\.ts$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: false,
+              compilerOptions: {
+                declaration: true,
+                declarationDir: './dist',
+              },
+            },
+          },
+        ],
+        exclude: [/node_modules/, /\.d\.ts$/], // Exclude .d.ts files from processing
       },
     ],
   },
@@ -28,11 +41,9 @@ const config = {
     plugins: [new TsconfigPathsPlugin()],
     modules: [path.resolve(process.cwd(), 'node_modules'), 'node_modules'],
   },
-  // externals: {
-  //   'core-js': 'core-js',
-  //   'dexie': 'dexie',
-  //   'uuid': 'uuid',
-  // },
+  externals: {
+    uuid: 'uuid',
+  },
   devServer: {
     static: {
       directory: path.join(process.cwd(), 'dist'), // Serve from the 'dist' folder

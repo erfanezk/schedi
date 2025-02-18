@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "dist",
+    "emitDeclarationOnly": false,
     "module": "ESNext",
     "target": "ESNext",
     "moduleResolution": "Node",
@@ -8,13 +11,15 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "src",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
+    "stripInternal": true,
+    "removeComments": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -26,6 +31,6 @@
     },
     "types": ["jest", "node"]
   },
-  "include": ["src", "tests"],
-  "exclude": ["node_modules", "dist", "build"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "build", "tests"]
 }
