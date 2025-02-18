@@ -5,7 +5,7 @@ Effortlessly manage **interval-based** and **one-time** tasks with precision and
 
 ## **Overview**
 
-Timelify provides a simple yet powerful solution for handling scheduled tasks in JavaScript and TypeScript
+Tempofy provides a simple yet powerful solution for handling scheduled tasks in JavaScript and TypeScript
 applications.
 
 ### **Key Features**
@@ -30,7 +30,7 @@ npm install timelify
 When using ESM:
 
 ```typescript
-import { IntervalTaskRunner, OneTimeTaskRunner } from 'timelify';
+import { IntervalTaskRunner, OneTimeTaskRunner } from 'tempofy';
 ```
 
 ### CommonJS
@@ -38,7 +38,7 @@ import { IntervalTaskRunner, OneTimeTaskRunner } from 'timelify';
 When using CJS:
 
 ```typescript
-const { IntervalTaskRunner, OneTimeTaskRunner } = require('timelify');
+const { IntervalTaskRunner, OneTimeTaskRunner } = require('tempofy');
 ```
 
 ### Browser
@@ -46,9 +46,9 @@ const { IntervalTaskRunner, OneTimeTaskRunner } = require('timelify');
 When using browser, include the script tag:
 
 ```html
-<script src="timelify.iife.js"></script>
+<script src="tempofy.iife.js"></script>
 <script>
-  const { IntervalTaskRunner, OneTimeTaskRunner } = timelify;
+  const { IntervalTaskRunner, OneTimeTaskRunner } = tempofy;
 </script>
 ```
 
@@ -86,7 +86,7 @@ stopTasks();
 The `OneTimeTaskRunner` schedules tasks to execute once at a predetermined time.
 
 ```typescript
-import { OneTimeTaskRunner } from 'timelify';
+import { OneTimeTaskRunner } from 'tempofy';
 
 // Initialize the task runner
 const oneTimeRunner = new OneTimeTaskRunner([]);
