@@ -12,6 +12,19 @@
     "url": "https://github.com/erfanezk",
     "email": "erfan.ezkat@gmail.com"
   },
+  "keywords": [
+    "task",
+    "task-runner",
+    "schedulify",
+    "schedule",
+    "automation",
+    "job-scheduler",
+    "timed-execution",
+    "recurring-tasks",
+    "background-tasks",
+    "setInterval",
+    "setTimeout"
+  ],
   "scripts": {
     "lint": "eslint . --ext .ts",
     "test": "jest --passWithNoTests",
