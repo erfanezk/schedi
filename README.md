@@ -5,7 +5,7 @@ Effortlessly manage **interval-based** and **one-time** tasks with precision and
 
 ## **Overview**
 
-Schedulify provides a simple yet powerful solution for handling scheduled tasks in JavaScript and TypeScript
+Timelify provides a simple yet powerful solution for handling scheduled tasks in JavaScript and TypeScript
 applications.
 
 ### **Key Features**
@@ -17,7 +17,7 @@ applications.
 
 ## **Installation**
 
-Install Schedulify via npm:
+Install timelify via npm:
 
 ```sh
 npm install timelify
@@ -86,7 +86,7 @@ stopTasks();
 The `OneTimeTaskRunner` schedules tasks to execute once at a predetermined time.
 
 ```typescript
-import { OneTimeTaskRunner } from 'schedulify';
+import { OneTimeTaskRunner } from 'timelify';
 
 // Initialize the task runner
 const oneTimeRunner = new OneTimeTaskRunner([]);
