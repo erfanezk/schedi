@@ -20,7 +20,7 @@ applications.
 Install Schedulify via npm:
 
 ```sh
-npm install schedulify-js
+npm install timelify
 ```
 
 ## **Usage**
@@ -30,7 +30,7 @@ npm install schedulify-js
 The `IntervalTaskRunner` schedules tasks to execute repeatedly at a fixed interval.
 
 ```typescript
-import { IntervalTaskRunner } from 'schedulify-js';
+import { IntervalTaskRunner } from 'timelify';
 
 // Initialize the task runner
 const intervalTaskRunner = new IntervalTaskRunner([]);

@@ -1,4 +1,4 @@
-import { IntervalTaskRunner } from '@/runners';
+import { IntervalTaskRunner } from '@/index';
 import { generateIntervalMockTask, secondsToMilliseconds } from './utils';
 
 describe('Interval task runner', () => {

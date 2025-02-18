@@ -1,36 +1,26 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "declarationDir": "dist",
-    "emitDeclarationOnly": false,
+    "target": "ES2020",
+    "useDefineForClassFields": true,
     "module": "ESNext",
-    "target": "ESNext",
-    "moduleResolution": "Node",
-    "esModuleInterop": true,
-    "strict": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
-    "rootDir": "src",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "stripInternal": true,
-    "removeComments": true,
-    "noImplicitThis": true,
+    "esModuleInterop": true,
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    /* Linting */
+    "strict": true,
+    "baseUrl": "./",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
-    },
-    "types": ["jest", "node"]
+    }
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "build", "tests"]
+  "include": ["src", "tests"]
 }

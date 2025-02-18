@@ -1,5 +1,5 @@
 import { generateOneTimeMockTask } from './utils';
-import { OneTimeTaskRunner } from '@/runners';
+import { OneTimeTaskRunner } from '@/index';
 
 describe('One time task runner', () => {
   const now = new Date();
