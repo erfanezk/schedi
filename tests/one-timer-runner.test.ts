@@ -194,4 +194,71 @@ describe('One time task runner', () => {
     expect(task1.callback).toHaveBeenCalledTimes(1);
     expect(task2.callback).toHaveBeenCalledTimes(1);
   });
+
+  it('should add a new task and schedule it immediately if startAt is in the past', () => {
+    // given
+    const taskRunner = new OneTimeTaskRunner([]);
+    const taskPayload = generateOneTimeMockTask({ startAt: Date.now() - 1000 });
+
+    // when
+    const newTask = taskRunner.addTask(taskPayload);
+    jest.advanceTimersByTime(1000);
+
+    // then
+    expect(newTask.callback).toHaveBeenCalledTimes(1);
+  });
+
+  it('should add a new task and schedule it correctly if startAt is in the future', () => {
+    // given
+    const taskRunner = new OneTimeTaskRunner([]);
+    const taskPayload = generateOneTimeMockTask({ startAt: Date.now() + 3000 });
+
+    // when
+    const newTask = taskRunner.addTask(taskPayload);
+    jest.advanceTimersByTime(2000);
+
+    // then
+    expect(newTask.callback).not.toHaveBeenCalled(); // Task should not execute yet
+
+    // when
+    jest.advanceTimersByTime(2000);
+
+    // then
+    expect(newTask.callback).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not execute a new task if it is expired', () => {
+    // given
+    const taskRunner = new OneTimeTaskRunner([]);
+    const taskPayload = generateOneTimeMockTask({ expireAt: Date.now() - 1000 });
+
+    // when
+    const newTask = taskRunner.addTask(taskPayload);
+    jest.advanceTimersByTime(2000);
+
+    // then
+    expect(newTask.callback).not.toHaveBeenCalled();
+  });
+
+  it('should execute multiple tasks with different start times', () => {
+    // given
+    const taskRunner = new OneTimeTaskRunner([]);
+    const task1 = generateOneTimeMockTask({ startAt: Date.now() + 1000 });
+    const task2 = generateOneTimeMockTask({ startAt: Date.now() + 2000 });
+
+    // when
+    taskRunner.addTask(task1);
+    taskRunner.addTask(task2);
+    jest.advanceTimersByTime(1500);
+
+    // then
+    expect(task1.callback).toHaveBeenCalledTimes(1);
+    expect(task2.callback).not.toHaveBeenCalled();
+
+    // when
+    jest.advanceTimersByTime(1000);
+
+    // then
+    expect(task2.callback).toHaveBeenCalledTimes(1);
+  });
 });
