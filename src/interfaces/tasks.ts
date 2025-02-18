@@ -5,20 +5,18 @@ interface ITask {
   name: string;
   createdAt: number;
   callback: ICallback;
+  expireAt: number;
+  startAt: number;
+
   enabled?: boolean;
 }
 
-interface IOneTimeTask extends ITask {
-  expireAt: number;
-  startAt: number;
-}
+type IOneTimeTask = ITask;
 
 interface IIntervalTask extends ITask {
   interval: number;
   lastRunAt: number | undefined;
   totalRunCount: number;
-  startAt: number;
-  expireAt: number;
 }
 
 type ICreateIntervalTaskPayload = Omit<
