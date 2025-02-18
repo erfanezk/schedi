@@ -13,16 +13,20 @@ interface IOneTimeTask extends ITask {
   startAt: number;
 }
 
+interface IOneTimeTaskCreatePayload {
+  name: string;
+  callback: <T>() => void | Promise<T>;
+  startAt: number;
+  expireAt: number;
+  enabled?: boolean;
+}
+
 interface IIntervalTask extends ITask {
   interval: number;
   lastRunAt: number | undefined;
   totalRunCount: number;
   startAt: number;
   expireAt: number;
-}
-
-interface IIntervalTaskInDB extends Omit<IIntervalTask, 'callback'> {
-  callback: string;
 }
 
 interface ICreateIntervalTaskPayload {
@@ -38,7 +42,7 @@ export type {
   ITask,
   IIntervalTask,
   ICreateIntervalTaskPayload,
-  IIntervalTaskInDB,
   ICallback,
   IOneTimeTask,
+  IOneTimeTaskCreatePayload,
 };
