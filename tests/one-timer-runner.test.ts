@@ -201,6 +201,7 @@ describe('One time task runner', () => {
     const taskPayload = generateOneTimeMockTask({ startAt: Date.now() - 1000 });
 
     // when
+    taskRunner.start();
     const newTask = taskRunner.addTask(taskPayload);
     jest.advanceTimersByTime(1000);
 
@@ -215,6 +216,7 @@ describe('One time task runner', () => {
 
     // when
     const newTask = taskRunner.addTask(taskPayload);
+    taskRunner.start();
     jest.advanceTimersByTime(2000);
 
     // then
@@ -247,6 +249,7 @@ describe('One time task runner', () => {
     const task2 = generateOneTimeMockTask({ startAt: Date.now() + 2000 });
 
     // when
+    taskRunner.start();
     taskRunner.addTask(task1);
     taskRunner.addTask(task2);
     jest.advanceTimersByTime(1500);
