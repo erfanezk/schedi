@@ -1,18 +1,53 @@
-import { IIntervalTask } from '@/interfaces';
+import { ICreateIntervalTaskPayload, IIntervalTask } from '@/interfaces';
+import { CommonUtils } from '@/utils';
 
+/**
+ * A class for scheduling and managing interval-based tasks.
+ */
 class IntervalTaskRunner {
   private taskIntervals: Map<string, number> = new Map(); // Stores active intervals
 
+  /**
+   * Creates an instance of IntervalTaskRunner.
+   * @param {IIntervalTask[]} tasks - An array of interval tasks to be managed.
+   */
   constructor(private tasks: IIntervalTask[]) {
     this.tasks = tasks;
   }
 
+  /**
+   * Starts all scheduled tasks and returns a function to stop them.
+   * @returns {() => void} Function to stop all running tasks.
+   */
   start(): () => void {
     this.tasks.forEach((task) => this.scheduleTask(task));
     return () => this.stopAllTasks();
   }
 
-  stopTask(taskId: string): void {
+  /**
+   * Adds a new interval task and schedules it.
+   * @param {ICreateIntervalTaskPayload} task - The task configuration.
+   * @returns {IIntervalTask} The newly created and scheduled task.
+   */
+  addTask(task: ICreateIntervalTaskPayload): IIntervalTask {
+    const newTask: IIntervalTask = {
+      ...task,
+      lastRunAt: undefined,
+      totalRunCount: 0,
+      id: CommonUtils.generateUniqueId(),
+      createdAt: Date.now(),
+      enabled: task.enabled ?? true,
+    };
+    this.tasks.push(newTask);
+    this.scheduleTask(newTask);
+    return newTask;
+  }
+
+  /**
+   * Stops a specific task by its ID.
+   * @param {string} taskId - The unique identifier of the task.
+   */
+  removeTask(taskId: string): void {
     if (!this.taskIntervals.has(taskId)) {
       return;
     }
@@ -20,12 +55,12 @@ class IntervalTaskRunner {
     clearInterval(this.taskIntervals.get(taskId)!);
     this.taskIntervals.delete(taskId);
 
-    const task = this.getTaskById(taskId);
-    if (task) {
-      task.enabled = false;
-    }
+    this.tasks = this.tasks.filter((task) => task.id !== taskId);
   }
 
+  /**
+   * Stops all running tasks and clears their intervals.
+   */
   stopAllTasks(): void {
     this.taskIntervals.forEach((intervalId) => clearInterval(intervalId));
     this.taskIntervals.clear();
@@ -79,15 +114,6 @@ class IntervalTaskRunner {
 
   private isTaskForFuture(task: IIntervalTask): boolean {
     return task.startAt > Date.now();
-  }
-
-  private getTaskById(taskId: string): IIntervalTask | undefined {
-    return this.tasks.find((task) => task.id === taskId);
-  }
-
-  private removeTask(taskId: string): void {
-    this.stopTask(taskId);
-    this.tasks = this.tasks.filter((task) => task.id !== taskId);
   }
 
   private isTaskExpired(task: IIntervalTask): boolean {
