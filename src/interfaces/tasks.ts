@@ -5,20 +5,12 @@ interface ITask {
   name: string;
   createdAt: number;
   callback: ICallback;
-  enabled: boolean;
+  enabled?: boolean;
 }
 
 interface IOneTimeTask extends ITask {
   expireAt: number;
   startAt: number;
-}
-
-interface IOneTimeTaskCreatePayload {
-  name: string;
-  callback: <T>() => void | Promise<T>;
-  startAt: number;
-  expireAt: number;
-  enabled?: boolean;
 }
 
 interface IIntervalTask extends ITask {
@@ -29,20 +21,17 @@ interface IIntervalTask extends ITask {
   expireAt: number;
 }
 
-interface ICreateIntervalTaskPayload {
-  name: string;
-  callback: <T>() => void | Promise<T>;
-  interval: number;
-  startAt: number;
-  expireAt: number;
-  enabled?: boolean;
-}
+type ICreateIntervalTaskPayload = Omit<
+  IIntervalTask,
+  'createdAt' | 'id' | 'totalRunCount' | 'lastRunAt'
+>;
+
+type IOneTimeTaskCreatePayload = Omit<IOneTimeTask, 'createdAt' | 'id'>;
 
 export type {
   ITask,
   IIntervalTask,
   ICreateIntervalTaskPayload,
-  ICallback,
   IOneTimeTask,
   IOneTimeTaskCreatePayload,
 };
