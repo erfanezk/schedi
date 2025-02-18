@@ -1,4 +1,4 @@
-# **Timelify**
+# **Tempofy**
 
 🚀 **A lightweight and flexible task scheduling library for JavaScript & TypeScript.**  
 Effortlessly manage **interval-based** and **one-time** tasks with precision and reliability.
