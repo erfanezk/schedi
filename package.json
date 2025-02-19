@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "schedi",
   "description": "A lightweight and flexible task scheduling library for JavaScript & TypeScript. Easily manage interval-based and one-time tasks with precise execution control.",
   "type": "module",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/erfanezk/tempofy.git"
+    "url": "git+https://github.com/erfanezk/schedi.git"
   },
   "author": {
     "name": "Erfan Ezkat",
