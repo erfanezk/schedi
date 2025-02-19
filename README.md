@@ -17,7 +17,7 @@ applications.
 
 ## **Installation**
 
-Install timelify via npm:
+Install schedi via npm:
 
 ```sh
 npm install schedi
@@ -117,13 +117,13 @@ properties for both `IntervalTaskRunner` and `OneTimeTaskRunner`.
 
 This configuration is used when adding a **one-time task**.
 
-| Property   | Type       | Required | Description                                                                   |
-| ---------- | ---------- | -------- | ----------------------------------------------------------------------------- |
-| `name`     | `string`   | ✅       | Optional name for the task.                                                   |
-| `callback` | `Function` | ✅       | Function to execute when the task runs.                                       |
-| `startAt`  | `number`   | ✅       | Timestamp (in ms) when the task should run.                                   |
-| `expireAt` | `number`   | ✅       | Timestamp (in ms) when the task expires (task won't execute after this time). |
-| `enabled`  | `boolean`  | ❌       | Indicates if the task is active (default: `true`).                            |
+| Property   | Type                  | Required | Description                                                                                       |
+| ---------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------- |
+| `name`     | `string`              | ✅       | Optional name for the task.                                                                       |
+| `callback` | `Function`            | ✅       | Function to execute when the task runs.                                                           |
+| `startAt`  | `number`              | ✅       | Timestamp (in ms) when the task should run.                                                       |
+| `expireAt` | `number`              | ❌       | Timestamp (in ms) when the task expires (task won't execute after this time).                     |
+| `enabled`  | `boolean \| Function` | ❌       | Indicates if the task is active (**can be `true`/`false` or a function that returns a boolean**). |
 
 ## **Interval Task Configuration**
 
@@ -131,14 +131,14 @@ This configuration is used when adding an **interval task**.
 
 ### **🔹 Configuration Properties**
 
-| Property   | Type       | Required | Description                                                                   |
-| ---------- | ---------- | -------- | ----------------------------------------------------------------------------- |
-| `name`     | `string`   | ✅       | Optional name for the task.                                                   |
-| `callback` | `Function` | ✅       | Function to execute on each interval.                                         |
-| `startAt`  | `number`   | ✅       | Timestamp (in ms) when the task should start.                                 |
-| `expireAt` | `number`   | ✅       | Timestamp (in ms) when the task expires (task won't execute after this time). |
-| `interval` | `number`   | ✅       | Time interval (in ms) between executions.                                     |
-| `enabled`  | `boolean`  | ❌       | Indicates if the task is active (default: `true`).                            |
+| Property   | Type                  | Required | Description                                                                                       |
+| ---------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------- |
+| `name`     | `string`              | ✅       | Optional name for the task.                                                                       |
+| `callback` | `Function`            | ✅       | Function to execute on each interval.                                                             |
+| `startAt`  | `number`              | ✅       | Timestamp (in ms) when the task should start.                                                     |
+| `interval` | `number`              | ✅       | Time interval (in ms) between executions.                                                         |
+| `expireAt` | `number`              | ❌       | Timestamp (in ms) when the task expires (task won't execute after this time).                     |
+| `enabled`  | `boolean \| Function` | ❌       | Indicates if the task is active (**can be `true`/`false` or a function that returns a boolean**). |
 
 ---
 
