@@ -10,7 +10,9 @@ class BaseRunner<T extends ITask> {
   }
 
   protected isTaskEnabled(task: T): boolean {
-    if (typeof task.enabled === 'function' && !task.enabled()) return false;
+    if (typeof task.enabled === 'function' && !task.enabled()) {
+      return false;
+    }
 
     return !(typeof task.enabled === 'boolean' && !task.enabled);
   }

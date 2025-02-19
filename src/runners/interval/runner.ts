@@ -80,7 +80,9 @@ class IntervalTaskRunner extends BaseRunner<IIntervalTask> {
       return;
     }
 
-    if (!this.isTaskEnabled(task)) return;
+    if (!this.isTaskEnabled(task)) {
+      return;
+    }
 
     if (this.isTaskScheduled(task)) {
       return;
