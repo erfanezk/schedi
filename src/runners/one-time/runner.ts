@@ -1,21 +1,22 @@
 import { IOneTimeTask, IOneTimeTaskCreatePayload } from '@/interfaces';
 import { CommonUtils } from '@/utils';
+import BaseRunner from '@/runners/base/runner.ts';
 
 /**
  * Class for managing one-time tasks.
  * Tasks are scheduled to execute once at a specific time and are then removed.
  */
-class OneTimeTaskRunner {
-  private taskTimeouts: Map<string, number> = new Map(); //taskId timeoutId
-
-  private isRunning = false;
-
+class OneTimeTaskRunner extends BaseRunner<IOneTimeTask> {
   /**
    * Creates an instance of OneTimeTaskRunner.
    * @param {IOneTimeTask[]} tasks - List of one-time tasks to be managed.
    */
-  constructor(public tasks: IOneTimeTask[] = []) {
-    this.tasks = tasks;
+  constructor(tasks: IOneTimeTask[] = []) {
+    super(tasks);
+  }
+
+  get tasks() {
+    return this._tasks;
   }
 
   /**
@@ -24,7 +25,7 @@ class OneTimeTaskRunner {
    */
   start(): () => void {
     this.isRunning = true;
-    this.tasks.forEach((task) => this.scheduleTask(task));
+    this._tasks.forEach((task) => this.scheduleTask(task));
     return () => this.stopAllTasks();
   }
 
@@ -39,7 +40,9 @@ class OneTimeTaskRunner {
       id: CommonUtils.generateUniqueId(),
       createdAt: Date.now(),
       enabled: data.enabled ?? true,
+      expireAt: data.expireAt ?? Infinity,
     };
+
     this.tasks.push(newTask);
 
     if (this.isRunning) {
@@ -54,23 +57,23 @@ class OneTimeTaskRunner {
    * @param {string} taskId - The unique identifier of the task.
    */
   removeTask(taskId: string): void {
-    if (!this.taskTimeouts.has(taskId)) {
+    if (!this.timers.has(taskId)) {
       return;
     }
 
-    clearTimeout(this.taskTimeouts.get(taskId)!);
-    this.taskTimeouts.delete(taskId);
+    clearTimeout(this.timers.get(taskId)!);
+    this.timers.delete(taskId);
 
-    this.tasks = this.tasks.filter((task) => task.id !== taskId);
+    this._tasks = this.tasks.filter((task) => task.id !== taskId);
   }
 
   /**
    * Stops all scheduled tasks and clears their timeouts.
    */
   stopAllTasks(): void {
-    this.taskTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
-    this.taskTimeouts.clear();
-    this.tasks = [];
+    this.timers.forEach((timeoutId) => clearTimeout(timeoutId));
+    this.timers.clear();
+    this._tasks = [];
   }
 
   private scheduleTask(task: IOneTimeTask): void {
@@ -85,7 +88,7 @@ class OneTimeTaskRunner {
     const delay = Math.max(0, task.startAt - Date.now());
 
     const timeoutId = window.setTimeout(() => this.executeTask(task), delay);
-    this.taskTimeouts.set(task.id, timeoutId);
+    this.timers.set(task.id, timeoutId);
   }
 
   private executeTask(task: IOneTimeTask): void {
@@ -97,14 +100,6 @@ class OneTimeTaskRunner {
     task.callback();
 
     this.removeTask(task.id);
-  }
-
-  private isTaskScheduled(task: IOneTimeTask): boolean {
-    return this.taskTimeouts.has(task.id);
-  }
-
-  private isTaskExpired(task: IOneTimeTask): boolean {
-    return task.expireAt < Date.now();
   }
 }
 

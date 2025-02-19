@@ -1,14 +1,15 @@
 type ICallback = <T>() => void | Promise<T>;
+type IEnabled = (() => boolean) | boolean;
 
 interface ITask {
   id: string;
   name: string;
   createdAt: number;
   callback: ICallback;
-  expireAt: number;
   startAt: number;
 
-  enabled?: boolean;
+  expireAt: number;
+  enabled: IEnabled;
 }
 
 type IOneTimeTask = ITask;
@@ -19,12 +20,20 @@ interface IIntervalTask extends ITask {
   totalRunCount: number;
 }
 
-type ICreateIntervalTaskPayload = Omit<
-  IIntervalTask,
-  'createdAt' | 'id' | 'totalRunCount' | 'lastRunAt'
->;
+interface ICreateIntervalTaskPayload
+  extends Omit<
+    IIntervalTask,
+    'createdAt' | 'id' | 'totalRunCount' | 'lastRunAt' | 'enabled' | 'expireAt'
+  > {
+  enabled?: IEnabled;
+  expireAt?: number;
+}
 
-type IOneTimeTaskCreatePayload = Omit<IOneTimeTask, 'createdAt' | 'id'>;
+interface IOneTimeTaskCreatePayload
+  extends Omit<IOneTimeTask, 'createdAt' | 'id' | 'enabled' | 'expireAt'> {
+  enabled?: IEnabled;
+  expireAt?: number;
+}
 
 export type {
   ITask,
