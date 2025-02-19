@@ -46,7 +46,7 @@ const { IntervalTaskRunner, OneTimeTaskRunner } = require('schedi');
 When using browser, include the script tag:
 
 ```html
-<script src="tempofy.iife.js"></script>
+<script src="schedi.iife.js"></script>
 <script>
   const { IntervalTaskRunner, OneTimeTaskRunner } = schedi;
 </script>
