@@ -1,11 +1,11 @@
-# **Tempofy**
+# **Schedi**
 
 🚀 **A lightweight and flexible task scheduling library for JavaScript & TypeScript.**  
 Effortlessly manage **interval-based** and **one-time** tasks with precision and reliability.
 
 ## **Overview**
 
-Tempofy provides a simple yet powerful solution for handling scheduled tasks in JavaScript and TypeScript
+Schedi provides a simple yet powerful solution for handling scheduled tasks in JavaScript and TypeScript
 applications.
 
 ### **Key Features**
@@ -20,7 +20,7 @@ applications.
 Install timelify via npm:
 
 ```sh
-npm install tempofy
+npm install schedi
 ```
 
 ## Import
@@ -30,7 +30,7 @@ npm install tempofy
 When using ESM:
 
 ```typescript
-import { IntervalTaskRunner, OneTimeTaskRunner } from 'tempofy';
+import { IntervalTaskRunner, OneTimeTaskRunner } from 'schedi';
 ```
 
 ### CommonJS
@@ -38,7 +38,7 @@ import { IntervalTaskRunner, OneTimeTaskRunner } from 'tempofy';
 When using CJS:
 
 ```typescript
-const { IntervalTaskRunner, OneTimeTaskRunner } = require('tempofy');
+const { IntervalTaskRunner, OneTimeTaskRunner } = require('schedi');
 ```
 
 ### Browser
@@ -48,7 +48,7 @@ When using browser, include the script tag:
 ```html
 <script src="tempofy.iife.js"></script>
 <script>
-  const { IntervalTaskRunner, OneTimeTaskRunner } = tempofy;
+  const { IntervalTaskRunner, OneTimeTaskRunner } = schedi;
 </script>
 ```
 
@@ -59,7 +59,7 @@ When using browser, include the script tag:
 The `IntervalTaskRunner` schedules tasks to execute repeatedly at a fixed interval.
 
 ```typescript
-import { IntervalTaskRunner } from 'timelify';
+import { IntervalTaskRunner } from 'schedi';
 
 // Initialize the task runner
 const intervalTaskRunner = new IntervalTaskRunner([]);
@@ -86,7 +86,7 @@ stopTasks();
 The `OneTimeTaskRunner` schedules tasks to execute once at a predetermined time.
 
 ```typescript
-import { OneTimeTaskRunner } from 'tempofy';
+import { OneTimeTaskRunner } from 'schedi';
 
 // Initialize the task runner
 const oneTimeRunner = new OneTimeTaskRunner([]);

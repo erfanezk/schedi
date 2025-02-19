@@ -9,8 +9,8 @@ export default defineConfig({
     minify: 'esbuild',
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'tempofy',
-      fileName: 'tempofy',
+      name: 'schedi',
+      fileName: 'schedi',
       formats: ['es', 'cjs', 'iife', 'umd', 'system'],
     },
   },
