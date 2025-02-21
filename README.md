@@ -46,6 +46,7 @@ const { IntervalTaskRunner, OneTimeTaskRunner } = require('schedi');
 When using browser, include the script tag:
 
 ```html
+
 <script src="schedi.iife.js"></script>
 <script>
   const { IntervalTaskRunner, OneTimeTaskRunner } = schedi;
@@ -69,6 +70,7 @@ const stopTasks = intervalTaskRunner.start();
 
 // Add a repeating task that runs every 5 seconds
 const task = intervalTaskRunner.addTask({
+  name: "logging",
   interval: 5000,
   callback: () => console.log('Repeating task executed'),
   enabled: true,
@@ -96,6 +98,7 @@ const stopOneTimeTasks = oneTimeRunner.start();
 
 // Schedule a one-time task to run in 10 seconds
 const task = oneTimeRunner.addTask({
+  name: "logging",
   startAt: Date.now() + 10000, // 10 seconds from now
   callback: () => console.log('One-time task executed'),
   enabled: true,
@@ -118,12 +121,12 @@ properties for both `IntervalTaskRunner` and `OneTimeTaskRunner`.
 This configuration is used when adding a **one-time task**.
 
 | Property   | Type                  | Required | Description                                                                                       |
-| ---------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------- |
-| `name`     | `string`              | ✅       | Optional name for the task.                                                                       |
-| `callback` | `Function`            | ✅       | Function to execute when the task runs.                                                           |
-| `startAt`  | `number`              | ✅       | Timestamp (in ms) when the task should run.                                                       |
-| `expireAt` | `number`              | ❌       | Timestamp (in ms) when the task expires (task won't execute after this time).                     |
-| `enabled`  | `boolean \| Function` | ❌       | Indicates if the task is active (**can be `true`/`false` or a function that returns a boolean**). |
+|------------|-----------------------|----------|---------------------------------------------------------------------------------------------------|
+| `name`     | `string`              | ✅        | Optional name for the task.                                                                       |
+| `callback` | `Function`            | ✅        | Function to execute when the task runs.                                                           |
+| `startAt`  | `number`              | ✅        | Timestamp (in ms) when the task should run.                                                       |
+| `expireAt` | `number`              | ❌        | Timestamp (in ms) when the task expires (task won't execute after this time).                     |
+| `enabled`  | `boolean \| Function` | ❌        | Indicates if the task is active (**can be `true`/`false` or a function that returns a boolean**). |
 
 ## **Interval Task Configuration**
 
@@ -132,15 +135,19 @@ This configuration is used when adding an **interval task**.
 ### **🔹 Configuration Properties**
 
 | Property   | Type                  | Required | Description                                                                                       |
-| ---------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------- |
-| `name`     | `string`              | ✅       | Optional name for the task.                                                                       |
-| `callback` | `Function`            | ✅       | Function to execute on each interval.                                                             |
-| `startAt`  | `number`              | ✅       | Timestamp (in ms) when the task should start.                                                     |
-| `interval` | `number`              | ✅       | Time interval (in ms) between executions.                                                         |
-| `expireAt` | `number`              | ❌       | Timestamp (in ms) when the task expires (task won't execute after this time).                     |
-| `enabled`  | `boolean \| Function` | ❌       | Indicates if the task is active (**can be `true`/`false` or a function that returns a boolean**). |
+|------------|-----------------------|----------|---------------------------------------------------------------------------------------------------|
+| `name`     | `string`              | ✅        | Optional name for the task.                                                                       |
+| `callback` | `Function`            | ✅        | Function to execute on each interval.                                                             |
+| `startAt`  | `number`              | ✅        | Timestamp (in ms) when the task should start.                                                     |
+| `interval` | `number`              | ✅        | Time interval (in ms) between executions.                                                         |
+| `expireAt` | `number`              | ❌        | Timestamp (in ms) when the task expires (task won't execute after this time).                     |
+| `enabled`  | `boolean \| Function` | ❌        | Indicates if the task is active (**can be `true`/`false` or a function that returns a boolean**). |
 
 ---
+
+> [!NOTE]
+> If you do not define expiredAt for a task, it will run indefinitely until it is manually removed. To set an expiration
+> time, provide a valid timestamp in the expiredAt field.
 
 ## Contributing
 
