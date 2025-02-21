@@ -1,5 +1,5 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "name": "schedi",
   "description": "A lightweight and flexible task scheduling library for JavaScript & TypeScript. Easily manage interval-based and one-time tasks with precise execution control.",
   "type": "module",
