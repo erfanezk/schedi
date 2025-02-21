@@ -1,4 +1,4 @@
-type ICallback = <T>() => void | Promise<T>;
+type ICallback = VoidFunction | (() => Promise<void>);
 type IEnabled = (() => boolean) | boolean;
 
 interface ITask {
