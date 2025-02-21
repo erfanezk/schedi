@@ -2,7 +2,7 @@ import { JestConfigWithTsJest } from 'ts-jest';
 
 const jestConfig: JestConfigWithTsJest = {
   preset: 'ts-jest/presets/default-esm',
-  testEnvironment: 'jsdom',
+  testEnvironment: 'node',
   extensionsToTreatAsEsm: ['.ts'],
   transform: {
     '^.+\\.(ts|tsx)$': [
