@@ -87,8 +87,8 @@ class OneTimeTaskRunner extends BaseRunner<IOneTimeTask> {
 
     const delay = Math.max(0, task.startAt - Date.now());
 
-    const timeoutId = window.setTimeout(() => this.executeTask(task), delay);
-    this.timers.set(task.id, timeoutId);
+    const timeout = setTimeout(() => this.executeTask(task), delay);
+    this.timers.set(task.id, timeout);
   }
 
   private executeTask(task: IOneTimeTask): void {

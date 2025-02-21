@@ -98,16 +98,16 @@ class IntervalTaskRunner extends BaseRunner<IIntervalTask> {
   private scheduleTaskForFuture(task: IIntervalTask): void {
     const delay = Math.max(0, task.startAt - Date.now());
 
-    const timeoutId = window.setTimeout(() => {
+    const timeout = setTimeout(() => {
       this.startInterval(task);
     }, delay);
 
-    this.timers.set(task.id, timeoutId);
+    this.timers.set(task.id, timeout);
   }
 
   private startInterval(task: IIntervalTask): void {
-    const intervalId = window.setInterval(() => this.executeTask(task), task.interval);
-    this.timers.set(task.id, intervalId);
+    const interval = setInterval(() => this.executeTask(task), task.interval);
+    this.timers.set(task.id, interval);
   }
 
   private executeTask(task: IIntervalTask): void {

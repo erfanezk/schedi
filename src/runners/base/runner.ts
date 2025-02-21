@@ -3,7 +3,7 @@ import { ITask } from '@/interfaces';
 class BaseRunner<T extends ITask> {
   protected _tasks: T[];
   protected isRunning = false;
-  protected timers: Map<string, number> = new Map(); //taskId -> timerId
+  protected timers: Map<string, NodeJS.Timeout> = new Map(); //taskId -> timeout
 
   constructor(tasks: T[]) {
     this._tasks = tasks;
