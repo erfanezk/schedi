@@ -1,5 +1,6 @@
 import { IntervalTaskRunner } from '@/index';
 import { generateIntervalMockTask, secondsToMilliseconds } from './utils';
+import { IIntervalTask } from '@/interfaces';
 
 describe('Interval task runner', () => {
   const now = new Date();
@@ -13,417 +14,547 @@ describe('Interval task runner', () => {
     jest.useRealTimers();
   });
 
-  it('should start tasks at minimum interval', () => {
-    // given
-    const task = generateIntervalMockTask();
-    const taskRunner = new IntervalTaskRunner([task]);
+  describe('Task Scheduling', () => {
+    it('should start a task after the minimum interval has passed', () => {
+      // given
+      const task = generateIntervalMockTask();
+      const taskRunner = new IntervalTaskRunner([task]);
 
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(1000);
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(1000);
 
-    // then
-    expect(task.callback).toHaveBeenCalledTimes(1);
+      // then
+      expect(task.callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not execute tasks before their startAt time', () => {
+      // given
+      const task = generateIntervalMockTask({ startAt: Date.now() + 2000 });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(1000);
+
+      // then
+      expect(task.callback).not.toHaveBeenCalled();
+    });
+
+    it('should execute a task after its startAt time has passed', () => {
+      // given
+      const task = generateIntervalMockTask({ startAt: Date.now() + 2000 });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(4000);
+
+      // then
+      expect(task.callback).toHaveBeenCalledTimes(2);
+    });
   });
 
-  it('should not run tasks before startAt', () => {
-    // given
-    const task = generateIntervalMockTask({ startAt: Date.now() + 2000 });
-    const taskRunner = new IntervalTaskRunner([task]);
+  describe('Task Removal and Expiration', () => {
+    it('should execute only non-expired tasks and remove expired ones', () => {
+      // given
+      const task = generateIntervalMockTask({ expireAt: Date.now() + secondsToMilliseconds(2) });
+      const taskRunner = new IntervalTaskRunner([task]);
 
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(1000);
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(4000);
 
-    // then
-    expect(task.callback).not.toHaveBeenCalled();
+      // then
+      expect(task.callback).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not execute tasks that expire immediately upon start', () => {
+      // given
+      const task = generateIntervalMockTask({ startAt: Date.now(), expireAt: Date.now() });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(1000);
+
+      // then
+      expect(task.callback).not.toHaveBeenCalled();
+    });
+
+    it('should stop all tasks from executing when stopped', () => {
+      // given
+      const task = generateIntervalMockTask({ interval: 1000 });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(1000);
+      taskRunner.stopAllTasks();
+      jest.advanceTimersByTime(1000);
+
+      // then
+      expect(task.callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should stop a specific task while allowing others to continue', () => {
+      // given
+      const task1 = generateIntervalMockTask({ id: 'task-1' });
+      const task2 = generateIntervalMockTask({ id: 'task-2' });
+      const taskRunner = new IntervalTaskRunner([task1, task2]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(1000);
+      taskRunner.removeTask('task-1');
+      jest.advanceTimersByTime(1000);
+
+      // then
+      expect(task1.callback).toHaveBeenCalledTimes(1);
+      expect(task2.callback).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not execute tasks that have already expired', () => {
+      // given
+      const task = generateIntervalMockTask({ expireAt: Date.now() - 1000 });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(1000);
+
+      // then
+      expect(task.callback).not.toHaveBeenCalled();
+    });
+
+    it('should not execute tasks that are disabled', () => {
+      // given
+      const task = generateIntervalMockTask({ enabled: false });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(1000);
+
+      // then
+      expect(task.callback).not.toHaveBeenCalled();
+    });
+
+    it('should stop tasks once expired, even if executing', () => {
+      // given
+      const task = generateIntervalMockTask({ expireAt: Date.now() + 1500 });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(1000); // Task runs once
+      jest.advanceTimersByTime(1000); // Task should expire
+
+      // then
+      expect(task.callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not execute a newly added task if it is expired', () => {
+      // given
+      const taskRunner = new IntervalTaskRunner([]);
+      const taskPayload = generateIntervalMockTask({ expireAt: Date.now() - 1000 });
+
+      // when
+      taskRunner.addTask(taskPayload);
+      jest.advanceTimersByTime(2000);
+
+      // then
+      expect(taskPayload.callback).not.toHaveBeenCalled();
+    });
   });
 
-  it('should start task after 2 sec', () => {
-    // given
-    const task = generateIntervalMockTask({ startAt: Date.now() + 2000 });
-    const taskRunner = new IntervalTaskRunner([task]);
+  describe('Task Execution', () => {
+    it('should execute a task periodically until it expires', () => {
+      // given
+      const task = generateIntervalMockTask();
+      const taskRunner = new IntervalTaskRunner([task]);
 
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(4000);
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(5000);
 
-    // then
-    expect(task.callback).toHaveBeenCalledTimes(2);
+      // then
+      expect(task.callback).toHaveBeenCalledTimes(5);
+    });
+
+    it('should handle multiple tasks with different execution intervals', () => {
+      // given
+      const task1 = generateIntervalMockTask({ interval: 1000 });
+      const task2 = generateIntervalMockTask({ interval: 2000 });
+      const taskRunner = new IntervalTaskRunner([task1, task2]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(5000);
+
+      // then
+      expect(task1.callback).toHaveBeenCalledTimes(5);
+      expect(task2.callback).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle tasks with long execution durations without missing intervals', () => {
+      // given
+      const task = generateIntervalMockTask({
+        callback: jest.fn(() => jest.advanceTimersByTime(200)), // Simulate long execution
+        interval: 1000,
+      });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(3000);
+
+      // then
+      expect(task.callback).toHaveBeenCalledTimes(3);
+    });
+
+    it('should execute a newly added task at its defined interval', () => {
+      // given
+      const taskRunner = new IntervalTaskRunner([]);
+      const taskPayload = generateIntervalMockTask({ startAt: Date.now(), interval: 2000 });
+
+      // when
+      taskRunner.start();
+      taskRunner.addTask(taskPayload);
+      jest.advanceTimersByTime(2000);
+
+      // then
+      expect(taskPayload.callback).toHaveBeenCalledTimes(1);
+
+      // when
+      jest.advanceTimersByTime(2000);
+
+      // then
+      expect(taskPayload.callback).toHaveBeenCalledTimes(2);
+    });
+
+    it('should correctly schedule tasks that start far in the future', () => {
+      // given
+      const task = generateIntervalMockTask({
+        startAt: Date.now() + 60000,
+        interval: 1000,
+      });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(59000);
+
+      // then
+      expect(task.callback).not.toHaveBeenCalled();
+
+      // when
+      jest.advanceTimersByTime(2000);
+
+      // then
+      expect(task.callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not execute a task once it has been removed', () => {
+      // given
+      const task = generateIntervalMockTask({ interval: 1000 });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(1000);
+      taskRunner.removeTask(task.id);
+      jest.advanceTimersByTime(3000);
+
+      // then
+      expect(task.callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not execute disabled tasks', () => {
+      // given
+      const task = generateIntervalMockTask({ enabled: false });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(1000);
+
+      // then
+      expect(task.callback).not.toHaveBeenCalled();
+    });
   });
 
-  it('should remove expired tasks', () => {
-    // given
-    const task = generateIntervalMockTask({ expireAt: Date.now() + secondsToMilliseconds(2) });
-    const taskRunner = new IntervalTaskRunner([task]);
+  describe('Task Scheduling with Large Numbers and Long Intervals', () => {
+    it('should handle tasks with very long intervals', () => {
+      // given
+      const task = generateIntervalMockTask({
+        interval: 60000,
+        expireAt: Date.now() + secondsToMilliseconds(130),
+      }); // 1-minute interval
+      const taskRunner = new IntervalTaskRunner([task]);
 
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(4000);
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(120000); // Advance by 2 minutes
 
-    // then
-    expect(task.callback).toHaveBeenCalledTimes(2);
+      // then
+      expect(task.callback).toHaveBeenCalledTimes(2);
+    });
+
+    it('should handle a large number of tasks efficiently', () => {
+      // given
+      const tasks = Array.from({ length: 100 }, (_, i) =>
+        generateIntervalMockTask({ id: `task-${i}`, interval: 1000 + i * 10 }),
+      );
+      const taskRunner = new IntervalTaskRunner(tasks);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(2000);
+
+      // then
+      tasks.forEach((task, i) => {
+        const expectedCalls = Math.floor(2000 / (1000 + i * 10));
+        expect(task.callback).toHaveBeenCalledTimes(expectedCalls);
+      });
+    });
   });
 
-  it('should stop all tasks', () => {
-    // given
-    const task = generateIntervalMockTask({ interval: 1000 });
-    const taskRunner = new IntervalTaskRunner([task]);
+  describe('Overlapping Intervals and Task Management', () => {
+    it('should correctly handle overlapping task intervals', () => {
+      // given
+      const task1 = generateIntervalMockTask({ interval: 1000 });
+      const task2 = generateIntervalMockTask({ interval: 500 });
+      const taskRunner = new IntervalTaskRunner([task1, task2]);
 
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(1000);
-    taskRunner.stopAllTasks();
-    jest.advanceTimersByTime(1000);
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(2000);
 
-    // then
-    expect(task.callback).toHaveBeenCalledTimes(1);
+      // then
+      expect(task1.callback).toHaveBeenCalledTimes(2); // Every 1000ms
+      expect(task2.callback).toHaveBeenCalledTimes(4); // Every 500ms
+    });
+
+    it('should execute multiple tasks starting at the same time', () => {
+      // given
+      const task1 = generateIntervalMockTask({ startAt: Date.now() });
+      const task2 = generateIntervalMockTask({ startAt: Date.now() });
+      const taskRunner = new IntervalTaskRunner([task1, task2]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(1000);
+
+      // then
+      expect(task1.callback).toHaveBeenCalledTimes(1);
+      expect(task2.callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should stop tasks that are removed during execution', () => {
+      // given
+      const task = generateIntervalMockTask();
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      taskRunner.removeTask(task.id);
+      jest.advanceTimersByTime(1000);
+
+      // then
+      expect(task.callback).not.toHaveBeenCalled();
+    });
+
+    it('should correctly add multiple tasks and execute them in sequence', () => {
+      // given
+      const taskRunner = new IntervalTaskRunner([]);
+      const task1 = generateIntervalMockTask({ startAt: Date.now() + 1000 });
+      const task2 = generateIntervalMockTask({ startAt: Date.now() + 2000 });
+
+      // when
+      taskRunner.start();
+      taskRunner.addTask(task1);
+      taskRunner.addTask(task2);
+      jest.advanceTimersByTime(2000);
+
+      // then
+      expect(task1.callback).toHaveBeenCalledTimes(1);
+      expect(task2.callback).not.toHaveBeenCalled();
+
+      // when
+      jest.advanceTimersByTime(1000);
+
+      // then
+      expect(task2.callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not execute tasks whose intervals exceed their expiration time', () => {
+      // given
+      const task = generateIntervalMockTask({ interval: 6000, expireAt: Date.now() + 5000 });
+      const taskRunner = new IntervalTaskRunner([task]);
+
+      // when
+      taskRunner.start();
+      jest.advanceTimersByTime(6000);
+
+      // then
+      expect(task.callback).not.toHaveBeenCalled();
+    });
   });
 
-  it('should stop a specific task', () => {
-    // given
-    const task1 = generateIntervalMockTask({ id: 'task-1' });
-    const task2 = generateIntervalMockTask({ id: 'task-2' });
-    const taskRunner = new IntervalTaskRunner([task1, task2]);
+  describe('Task Addition and Removal', () => {
+    it('should immediately execute tasks scheduled in the past', () => {
+      // given
+      const taskRunner = new IntervalTaskRunner([]);
+      const taskPayload = generateIntervalMockTask({ startAt: Date.now() - 1000 });
 
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(1000);
-    taskRunner.removeTask('task-1');
-    jest.advanceTimersByTime(1000);
+      // when
+      taskRunner.start();
+      taskRunner.addTask(taskPayload);
+      jest.advanceTimersByTime(1000);
 
-    // then
-    expect(task1.callback).toHaveBeenCalledTimes(1);
-    expect(task2.callback).toHaveBeenCalledTimes(2);
+      // then
+      expect(taskPayload.callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should schedule tasks correctly when startAt is in the future', () => {
+      // given
+      const taskRunner = new IntervalTaskRunner([]);
+      const taskPayload = generateIntervalMockTask({ startAt: Date.now() + 3000 });
+
+      // when
+      taskRunner.start();
+      taskRunner.addTask(taskPayload);
+      jest.advanceTimersByTime(2000);
+
+      // then
+      expect(taskPayload.callback).not.toHaveBeenCalled(); // Task should not execute yet
+
+      // when
+      jest.advanceTimersByTime(2000);
+
+      // then
+      expect(taskPayload.callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not execute tasks that are expired when added', () => {
+      // given
+      const taskRunner = new IntervalTaskRunner([]);
+      const taskPayload = generateIntervalMockTask({ expireAt: Date.now() - 1000 });
+
+      // when
+      taskRunner.addTask(taskPayload);
+      jest.advanceTimersByTime(2000);
+
+      // then
+      expect(taskPayload.callback).not.toHaveBeenCalled();
+    });
+
+    it('should add and remove a task before it executes', () => {
+      // given
+      const taskRunner = new IntervalTaskRunner([]);
+      const task = generateIntervalMockTask({ startAt: Date.now() + 3000 });
+
+      // when
+      taskRunner.start();
+      const newTask = taskRunner.addTask(task);
+      taskRunner.removeTask(newTask.id);
+      jest.advanceTimersByTime(4000);
+
+      // then
+      expect(task.callback).not.toHaveBeenCalled();
+    });
   });
 
-  it('should execute a single task periodically until expiration', () => {
-    // given
-    const task = generateIntervalMockTask();
-    const taskRunner = new IntervalTaskRunner([task]);
-
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(5000);
-
-    // then
-    expect(task.callback).toHaveBeenCalledTimes(5);
-  });
-
-  it('should handle multiple tasks with different intervals', () => {
-    // given
-    const task1 = generateIntervalMockTask({ interval: 1000 });
-    const task2 = generateIntervalMockTask({ interval: 2000 });
-    const taskRunner = new IntervalTaskRunner([task1, task2]);
-
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(5000);
-
-    // then
-    expect(task1.callback).toHaveBeenCalledTimes(5);
-    expect(task2.callback).toHaveBeenCalledTimes(2);
-  });
-
-  it('should handle tasks with intervals greater than expiration time', () => {
-    // given
-    const task = generateIntervalMockTask({ interval: 6000, expireAt: Date.now() + 5000 });
-    const taskRunner = new IntervalTaskRunner([task]);
-
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(6000);
-
-    // then
-    expect(task.callback).not.toHaveBeenCalled();
-  });
-
-  it('should not run tasks that expire immediately', () => {
-    // given
-    const task = generateIntervalMockTask({ startAt: Date.now(), expireAt: Date.now() });
-    const taskRunner = new IntervalTaskRunner([task]);
-
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(1000);
-
-    // then
-    expect(task.callback).not.toHaveBeenCalled();
-  });
-
-  it('should not execute tasks already expired', () => {
-    // given
-    const task = generateIntervalMockTask({ expireAt: Date.now() - 1000 });
-    const taskRunner = new IntervalTaskRunner([task]);
-
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(1000);
-
-    // then
-    expect(task.callback).not.toHaveBeenCalled();
-  });
-
-  it('should not run disabled tasks', () => {
-    // given
-    const task = generateIntervalMockTask({ enabled: false });
-    const taskRunner = new IntervalTaskRunner([task]);
-
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(1000);
-
-    // then
-    expect(task.callback).not.toHaveBeenCalled();
-  });
-
-  it('should handle tasks with long execution times', () => {
-    // given
-    const task = generateIntervalMockTask({
-      callback: jest.fn(() => jest.advanceTimersByTime(200)), // Simulate long execution
+  describe('Task Update', () => {
+    const initialTask: IIntervalTask = {
+      id: '1',
       interval: 1000,
+      startAt: Date.now(),
+      enabled: true,
+      expireAt: Infinity,
+      callback: jest.fn(),
+      createdAt: Date.now(),
+      name: 'task-1',
+      totalRunCount: 0,
+      lastRunAt: undefined,
+    };
+
+    it('should update an existing task successfully', () => {
+      // given
+      const taskRunner = new IntervalTaskRunner([initialTask]);
+      const updatedData = { interval: 2000 };
+
+      // when
+      taskRunner.start();
+      const updatedTask = taskRunner.updateTask('1', updatedData);
+
+      // then
+      expect(updatedTask).toBeDefined();
+      expect(updatedTask?.id).toBe('1');
+      expect(updatedTask?.interval).toBe(2000);
+      expect(updatedTask?.startAt).toBe(initialTask.startAt); // Ensure other properties remain the same
     });
-    const taskRunner = new IntervalTaskRunner([task]);
 
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(3000);
+    it('should return undefined when the task does not exist', () => {
+      // given
+      const taskRunner = new IntervalTaskRunner([initialTask]);
 
-    // then
-    expect(task.callback).toHaveBeenCalledTimes(3);
-  });
+      // when
+      taskRunner.start();
+      const updatedTask = taskRunner.updateTask('non-existing-id', { interval: 3000 });
 
-  it('should handle tasks with very long intervals', () => {
-    // given
-    const task = generateIntervalMockTask({
-      interval: 60000,
-      expireAt: Date.now() + secondsToMilliseconds(130),
-    }); // 1-minute interval
-    const taskRunner = new IntervalTaskRunner([task]);
-
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(120000); // Advance by 2 minutes
-
-    // then
-    expect(task.callback).toHaveBeenCalledTimes(2);
-  });
-
-  it('should handle a large number of tasks efficiently', () => {
-    // given
-    const tasks = Array.from({ length: 100 }, (_, i) =>
-      generateIntervalMockTask({ id: `task-${i}`, interval: 1000 + i * 10 }),
-    );
-    const taskRunner = new IntervalTaskRunner(tasks);
-
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(2000);
-
-    // then
-    tasks.forEach((task, i) => {
-      const expectedCalls = Math.floor(2000 / (1000 + i * 10));
-      expect(task.callback).toHaveBeenCalledTimes(expectedCalls);
+      // then
+      expect(updatedTask).toBeUndefined();
     });
-  });
 
-  it('should handle overlapping task intervals correctly', () => {
-    // given
-    const task1 = generateIntervalMockTask({ interval: 1000 });
-    const task2 = generateIntervalMockTask({ interval: 500 });
-    const taskRunner = new IntervalTaskRunner([task1, task2]);
+    it('should update only provided fields and leave others unchanged', () => {
+      // given
+      const updatedData = { interval: 3000 };
+      const taskRunner = new IntervalTaskRunner([initialTask]);
 
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(2000);
+      // when
+      taskRunner.start();
+      const updatedTask = taskRunner.updateTask('1', updatedData);
 
-    // then
-    expect(task1.callback).toHaveBeenCalledTimes(2); // Every 1000ms
-    expect(task2.callback).toHaveBeenCalledTimes(4); // Every 500ms
-  });
-
-  it('should handle multiple tasks starting at the same time', () => {
-    // given
-    const task1 = generateIntervalMockTask({ startAt: Date.now() });
-    const task2 = generateIntervalMockTask({ startAt: Date.now() });
-    const taskRunner = new IntervalTaskRunner([task1, task2]);
-
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(1000);
-
-    // then
-    expect(task1.callback).toHaveBeenCalledTimes(1);
-    expect(task2.callback).toHaveBeenCalledTimes(1);
-  });
-
-  it('should handle task expiration during execution', () => {
-    // given
-    const task = generateIntervalMockTask({ expireAt: Date.now() + 1500 });
-    const taskRunner = new IntervalTaskRunner([task]);
-
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(1000); // Task runs once
-    jest.advanceTimersByTime(1000); // Task should expire
-
-    // then
-    expect(task.callback).toHaveBeenCalledTimes(1);
-  });
-
-  it('should handle tasks that are started and stopped at the same time', () => {
-    // given
-    const task = generateIntervalMockTask();
-    const taskRunner = new IntervalTaskRunner([task]);
-
-    // when
-    taskRunner.start();
-    taskRunner.removeTask(task.id);
-    jest.advanceTimersByTime(1000);
-
-    // then
-    expect(task.callback).not.toHaveBeenCalled();
-  });
-
-  it('should not execute a stopped task again', () => {
-    // given
-    const task = generateIntervalMockTask({ interval: 1000 });
-    const taskRunner = new IntervalTaskRunner([task]);
-
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(1000);
-    taskRunner.removeTask(task.id);
-    jest.advanceTimersByTime(3000);
-
-    // then
-    expect(task.callback).toHaveBeenCalledTimes(1);
-  });
-
-  it('should schedule tasks far in the future correctly', () => {
-    // given
-    const task = generateIntervalMockTask({
-      startAt: Date.now() + 60000,
-      interval: 1000,
+      // then
+      expect(updatedTask).toBeDefined();
+      expect(updatedTask?.id).toBe('1');
+      expect(updatedTask?.interval).toBe(3000);
+      expect(updatedTask?.startAt).toBe(initialTask.startAt); // Ensure the `startAt` was not modified
     });
-    const taskRunner = new IntervalTaskRunner([task]);
 
-    // when
-    taskRunner.start();
-    jest.advanceTimersByTime(59000);
+    it('should not modify the task if no data is provided', () => {
+      // given
+      const taskRunner = new IntervalTaskRunner([initialTask]);
 
-    // then
-    expect(task.callback).not.toHaveBeenCalled();
+      // when
+      taskRunner.start();
+      const updatedTask = taskRunner.updateTask('1', {});
 
-    // when
-    jest.advanceTimersByTime(2000);
+      // then
+      expect(updatedTask).toBeDefined();
+      expect(updatedTask?.id).toBe('1');
+      expect(updatedTask?.interval).toBe(initialTask.interval);
+      expect(updatedTask?.startAt).toBe(initialTask.startAt);
+    });
 
-    // then
-    expect(task.callback).toHaveBeenCalledTimes(1);
-  });
+    it('should update an already updated task', () => {
+      // given
+      const taskRunner = new IntervalTaskRunner([initialTask]);
+      const firstUpdate = { interval: 1500 };
+      const secondUpdate = { startAt: Date.now() + 1000 };
 
-  it('should add a new task and schedule it immediately if startAt is in the past', () => {
-    // given
-    const taskRunner = new IntervalTaskRunner([]);
-    const taskPayload = generateIntervalMockTask({ startAt: Date.now() - 1000 });
+      // when
+      taskRunner.start();
+      taskRunner.updateTask('1', firstUpdate);
+      const updatedTask = taskRunner.updateTask('1', secondUpdate);
 
-    // when
-    taskRunner.start();
-    taskRunner.addTask(taskPayload);
-    jest.advanceTimersByTime(1000);
-
-    // then
-    expect(taskPayload.callback).toHaveBeenCalledTimes(1);
-  });
-
-  it('should add a new task and schedule it correctly if startAt is in the future', () => {
-    // given
-    const taskRunner = new IntervalTaskRunner([]);
-    const taskPayload = generateIntervalMockTask({ startAt: Date.now() + 3000 });
-
-    // when
-    taskRunner.start();
-    taskRunner.addTask(taskPayload);
-    jest.advanceTimersByTime(2000);
-
-    // then
-    expect(taskPayload.callback).not.toHaveBeenCalled(); // Task should not execute yet
-
-    // when
-    jest.advanceTimersByTime(2000);
-
-    // then
-    expect(taskPayload.callback).toHaveBeenCalledTimes(1);
-  });
-
-  it('should execute a newly added task at its defined interval', () => {
-    // given
-    const taskRunner = new IntervalTaskRunner([]);
-    const taskPayload = generateIntervalMockTask({ startAt: Date.now(), interval: 2000 });
-
-    // when
-    taskRunner.start();
-    taskRunner.addTask(taskPayload);
-    jest.advanceTimersByTime(2000);
-
-    // then
-    expect(taskPayload.callback).toHaveBeenCalledTimes(1);
-
-    // when
-    jest.advanceTimersByTime(2000);
-
-    // then
-    expect(taskPayload.callback).toHaveBeenCalledTimes(2);
-  });
-
-  it('should not execute a new task if it is expired', () => {
-    // given
-    const taskRunner = new IntervalTaskRunner([]);
-    const taskPayload = generateIntervalMockTask({ expireAt: Date.now() - 1000 });
-
-    // when
-    taskRunner.addTask(taskPayload);
-    jest.advanceTimersByTime(2000);
-
-    // then
-    expect(taskPayload.callback).not.toHaveBeenCalled();
-  });
-
-  it('should add multiple tasks and execute them correctly', () => {
-    // given
-    const taskRunner = new IntervalTaskRunner([]);
-    const task1 = generateIntervalMockTask({ startAt: Date.now() + 1000 });
-    const task2 = generateIntervalMockTask({ startAt: Date.now() + 2000 });
-
-    // when
-    taskRunner.start();
-    taskRunner.addTask(task1);
-    taskRunner.addTask(task2);
-    jest.advanceTimersByTime(2000);
-
-    // then
-    expect(task1.callback).toHaveBeenCalledTimes(1);
-    expect(task2.callback).not.toHaveBeenCalled();
-
-    // when
-    jest.advanceTimersByTime(1000);
-
-    // then
-    expect(task2.callback).toHaveBeenCalledTimes(1);
-  });
-
-  it('should add a task and remove it before execution', () => {
-    // given
-    const taskRunner = new IntervalTaskRunner([]);
-    const task = generateIntervalMockTask({ startAt: Date.now() + 3000 });
-
-    // when
-    taskRunner.start();
-    const newTask = taskRunner.addTask(task);
-    taskRunner.removeTask(newTask.id);
-    jest.advanceTimersByTime(4000);
-
-    // then
-    expect(task.callback).not.toHaveBeenCalled();
+      // then
+      expect(updatedTask).toBeDefined();
+      expect(updatedTask?.id).toBe('1');
+      expect(updatedTask?.startAt).toBeGreaterThan(initialTask.startAt); // Check that `startAt` was updated
+      expect(updatedTask?.interval).toBe(1500); // First update remains
+    });
   });
 });
