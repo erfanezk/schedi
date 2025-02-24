@@ -1,4 +1,4 @@
-import { IOneTimeTask, IOneTimeTaskCreatePayload } from '@/interfaces';
+import { IIntervalTaskCreatePayload, IOneTimeTask, IOneTimeTaskCreatePayload } from '@/interfaces';
 import { CommonUtils } from '@/utils';
 import BaseRunner from '@/runners/base/runner.ts';
 
@@ -53,21 +53,6 @@ class OneTimeTaskRunner extends BaseRunner<IOneTimeTask> {
   }
 
   /**
-   * Removes a specific task by its ID.
-   * @param {string} taskId - The unique identifier of the task.
-   */
-  removeTask(taskId: string): void {
-    if (!this.timers.has(taskId)) {
-      return;
-    }
-
-    clearTimeout(this.timers.get(taskId)!);
-    this.timers.delete(taskId);
-
-    this._tasks = this.tasks.filter((task) => task.id !== taskId);
-  }
-
-  /**
    * Stops all scheduled tasks and clears their timeouts.
    */
   stopAllTasks(): void {
@@ -76,18 +61,34 @@ class OneTimeTaskRunner extends BaseRunner<IOneTimeTask> {
     this._tasks = [];
   }
 
-  private scheduleTask(task: IOneTimeTask): void {
-    if (this.isTaskExpired(task) || !task.enabled) {
-      return;
+  /**
+   * Updates a task in the task list by its ID.
+   * If the task with the provided ID is found, it will merge the existing task data with the new `data` object.
+   * The updated task is returned. If the task is not found, `undefined` is returned.
+   *
+   * @param {string} id - The ID of the task to update.
+   * @param {Partial<IOneTimeTaskCreatePayload>} data - The data to update the task with. It can be a partial object of the task's payload.
+   *
+   * @returns {IOneTimeTask | undefined} The updated task if found and updated, otherwise `undefined` if no task was found with the provided ID.
+   */
+  updateTask(id: string, data: Partial<IIntervalTaskCreatePayload>): IOneTimeTask | undefined {
+    const updatedTask = super.updateTask(id, data);
+
+    if (updatedTask) {
+      this.scheduleTask(updatedTask);
     }
 
-    if (this.isTaskScheduled(task)) {
+    return updatedTask;
+  }
+
+  private scheduleTask(task: IOneTimeTask): void {
+    if (!this.canScheduleTask(task)) {
       return;
     }
 
     const delay = Math.max(0, task.startAt - Date.now());
-
     const timeout = setTimeout(() => this.executeTask(task), delay);
+
     this.timers.set(task.id, timeout);
   }
 

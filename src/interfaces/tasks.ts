@@ -20,7 +20,7 @@ interface IIntervalTask extends ITask {
   totalRunCount: number;
 }
 
-interface ICreateIntervalTaskPayload
+interface IIntervalTaskCreatePayload
   extends Omit<
     IIntervalTask,
     'createdAt' | 'id' | 'totalRunCount' | 'lastRunAt' | 'enabled' | 'expireAt'
@@ -38,7 +38,7 @@ interface IOneTimeTaskCreatePayload
 export type {
   ITask,
   IIntervalTask,
-  ICreateIntervalTaskPayload,
+  IIntervalTaskCreatePayload,
   IOneTimeTask,
   IOneTimeTaskCreatePayload,
 };

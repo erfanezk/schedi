@@ -1,4 +1,4 @@
-import { ICreateIntervalTaskPayload, IIntervalTask } from '@/interfaces';
+import { IIntervalTask, IIntervalTaskCreatePayload } from '@/interfaces';
 import { CommonUtils } from '@/utils';
 import BaseRunner from '@/runners/base/runner.ts';
 
@@ -33,7 +33,7 @@ class IntervalTaskRunner extends BaseRunner<IIntervalTask> {
    * @returns {IIntervalTask} The newly created and scheduled task.
    * @param data
    */
-  addTask(data: ICreateIntervalTaskPayload): IIntervalTask {
+  addTask(data: IIntervalTaskCreatePayload): IIntervalTask {
     const newTask: IIntervalTask = {
       ...data,
       lastRunAt: undefined,
@@ -53,21 +53,6 @@ class IntervalTaskRunner extends BaseRunner<IIntervalTask> {
   }
 
   /**
-   * Stops a specific task by its ID.
-   * @param {string} taskId - The unique identifier of the task.
-   */
-  removeTask(taskId: string): void {
-    if (!this.timers.has(taskId)) {
-      return;
-    }
-
-    clearInterval(this.timers.get(taskId)!);
-    this.timers.delete(taskId);
-
-    this._tasks = this._tasks.filter((task) => task.id !== taskId);
-  }
-
-  /**
    * Stops all running tasks and clears their intervals.
    */
   stopAllTasks(): void {
@@ -75,33 +60,39 @@ class IntervalTaskRunner extends BaseRunner<IIntervalTask> {
     this.timers.clear();
   }
 
+  /**
+   * Updates a task in the task list by its ID.
+   * If the task with the provided ID is found, it will merge the existing task data with the new `data` object.
+   * The updated task is returned. If the task is not found, `undefined` is returned.
+   *
+   * @param {string} id - The ID of the task to update.
+   * @param {Partial<IIntervalTaskCreatePayload>} data - The data to update the task with. It can be a partial object of the task's payload.
+   *
+   * @returns {IIntervalTask | undefined} The updated task if found and updated, otherwise `undefined` if no task was found with the provided ID.
+   */
+  updateTask(id: string, data: Partial<IIntervalTaskCreatePayload>): IIntervalTask | undefined {
+    const updatedTask = super.updateTask(id, data);
+
+    if (updatedTask) {
+      this.scheduleTask(updatedTask);
+    }
+
+    return updatedTask;
+  }
+
   private scheduleTask(task: IIntervalTask): void {
-    if (this.isTaskExpired(task)) {
-      return;
-    }
-
-    if (!this.isTaskEnabled(task)) {
-      return;
-    }
-
-    if (this.isTaskScheduled(task)) {
-      return;
-    }
-
-    if (this.isTaskForFuture(task)) {
-      this.scheduleTaskForFuture(task);
-    } else {
-      this.startInterval(task);
+    if (this.canScheduleTask(task)) {
+      if (this.isTaskForFuture(task)) {
+        this.scheduleTaskForFuture(task);
+      } else {
+        this.startInterval(task);
+      }
     }
   }
 
   private scheduleTaskForFuture(task: IIntervalTask): void {
     const delay = Math.max(0, task.startAt - Date.now());
-
-    const timeout = setTimeout(() => {
-      this.startInterval(task);
-    }, delay);
-
+    const timeout = setTimeout(() => this.startInterval(task), delay);
     this.timers.set(task.id, timeout);
   }
 
