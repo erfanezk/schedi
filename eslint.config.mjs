@@ -3,7 +3,7 @@ import globals from 'globals';
 import neostandard from 'neostandard';
 import tseslint from 'typescript-eslint';
 
-const neostandardConfig = neostandard({ semi: true, noStyle: true });
+const neostandardConfig = neostandard({ semi: true, noStyle: true});
 
 export default [
   js.configs.recommended,
@@ -18,6 +18,7 @@ export default [
         ...globals.commonjs,
         ...globals.jest,
         ...globals.node,
+        NodeJS:true
       },
     },
   },
