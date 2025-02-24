@@ -41,7 +41,8 @@
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "lint:fix": "eslint . --ext .ts --fix",
-    "build": "tsc && vite build"
+    "build": "tsc && vite build",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
