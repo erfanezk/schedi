@@ -35,14 +35,7 @@ class OneTimeTaskRunner extends BaseRunner<IOneTimeTask> {
    * @returns {IOneTimeTask} The newly created and scheduled task.
    */
   addTask(data: IOneTimeTaskCreatePayload): IOneTimeTask {
-    const newTask: IOneTimeTask = {
-      ...data,
-      id: CommonUtils.generateUniqueId(),
-      createdAt: Date.now(),
-      enabled: data.enabled ?? true,
-      expireAt: data.expireAt ?? Infinity,
-    };
-
+    const newTask = this.createTask(data);
     this.tasks.push(newTask);
 
     if (this.isRunning) {
@@ -79,6 +72,16 @@ class OneTimeTaskRunner extends BaseRunner<IOneTimeTask> {
     }
 
     return updatedTask;
+  }
+
+  private createTask(data: IOneTimeTaskCreatePayload): IOneTimeTask {
+    return {
+      ...data,
+      id: CommonUtils.generateUniqueId(),
+      createdAt: Date.now(),
+      enabled: data.enabled ?? true,
+      expireAt: data.expireAt ?? Infinity,
+    };
   }
 
   private scheduleTask(task: IOneTimeTask): void {

@@ -21,28 +21,22 @@ class BaseRunner<T extends ITask> {
     this._tasks = this._tasks.filter((task) => task.id !== taskId);
   }
 
-  updateTask<Y extends Partial<T>>(id: string, data: Y): T | undefined {
+  updateTask(id: string, data: Partial<T>): T | undefined {
     const index = this._tasks.findIndex((task) => task.id === id);
-
     if (index >= 0) {
-      const newTaskToSchedule = {
-        ...this._tasks[index],
-        ...data,
-      };
-      this._tasks[index] = newTaskToSchedule;
+      const updatedTask = { ...this._tasks[index], ...data };
+      this._tasks[index] = updatedTask;
       this.removeTimer(id);
-      return newTaskToSchedule;
+      return updatedTask;
     }
-
     return undefined;
   }
 
   protected isTaskEnabled(task: T): boolean {
-    if (typeof task.enabled === 'function' && !task.enabled()) {
-      return false;
+    if (typeof task.enabled === 'function') {
+      return task.enabled();
     }
-
-    return !(typeof task.enabled === 'boolean' && !task.enabled);
+    return task.enabled;
   }
 
   protected isTaskForFuture(task: T): boolean {

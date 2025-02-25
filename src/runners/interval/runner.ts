@@ -34,15 +34,7 @@ class IntervalTaskRunner extends BaseRunner<IIntervalTask> {
    * @param data
    */
   addTask(data: IIntervalTaskCreatePayload): IIntervalTask {
-    const newTask: IIntervalTask = {
-      ...data,
-      lastRunAt: undefined,
-      totalRunCount: 0,
-      id: CommonUtils.generateUniqueId(),
-      createdAt: Date.now(),
-      enabled: data.enabled ?? true,
-      expireAt: data.expireAt ?? Infinity,
-    };
+    const newTask: IIntervalTask = this.createTask(data);
     this._tasks.push(newTask);
 
     if (this.isRunning) {
@@ -78,6 +70,18 @@ class IntervalTaskRunner extends BaseRunner<IIntervalTask> {
     }
 
     return updatedTask;
+  }
+
+  private createTask(data: IIntervalTaskCreatePayload): IIntervalTask {
+    return {
+      ...data,
+      lastRunAt: undefined,
+      totalRunCount: 0,
+      id: CommonUtils.generateUniqueId(),
+      createdAt: Date.now(),
+      enabled: data.enabled ?? true,
+      expireAt: data.expireAt ?? Infinity,
+    };
   }
 
   private scheduleTask(task: IIntervalTask): void {
