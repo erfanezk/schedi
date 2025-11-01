@@ -1,5 +1,5 @@
 {
-  "name": "@schedi/core",
+  "name": "@taskwave/core",
   "version": "2.0.1",
   "description": "Core scheduling functionality for JavaScript and TypeScript applications",
   "keywords": [
@@ -15,12 +15,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/erfanezk/schedi.git",
+    "url": "https://github.com/erfanezk/taskwave.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/erfanezk/schedi#readme",
+  "homepage": "https://github.com/erfanezk/taskwave#readme",
   "bugs": {
-    "url": "https://github.com/erfanezk/schedi/issues"
+    "url": "https://github.com/erfanezk/taskwave/issues"
   },
   "type": "module",
   "main": "./dist/index.cjs",

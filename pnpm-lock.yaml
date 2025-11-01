@@ -48,7 +48,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@schedi/core':
+      '@taskwave/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

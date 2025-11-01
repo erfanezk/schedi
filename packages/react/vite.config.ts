@@ -14,7 +14,7 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
-			name: 'SchediReact',
+			name: 'TaskwaveReact',
 			formats: ['es', 'cjs'],
 			fileName: (format) => {
 				if (format === 'es') return 'index.js'
@@ -23,12 +23,12 @@ export default defineConfig({
 			}
 		},
 		rollupOptions: {
-			external: ['react', '@schedi/core'],
+			external: ['react', '@taskwave/core'],
 			output: {
 				preserveModules: false,
 				globals: {
 					react: 'React',
-					'@schedi/core': 'SchediCore'
+					'@taskwave/core': 'TaskwaveCore'
 				}
 			}
 		},

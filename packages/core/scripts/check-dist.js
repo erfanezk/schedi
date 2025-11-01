@@ -3,7 +3,7 @@
 import { existsSync } from "fs";
 import { join } from "path";
 
-console.log("Testing @schedi/core package build...\n");
+console.log("Testing @taskwave/core package build...\n");
 
 try {
   // Verify build output

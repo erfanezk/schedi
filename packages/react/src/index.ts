@@ -1,6 +1,6 @@
 /**
- * @schedi/react
- * React bindings for schedi
+ * @taskwave/react
+ * React bindings for taskwave
  */
 
 export {}

@@ -20,7 +20,7 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
-			name: 'SchediCore',
+			name: 'TaskwaveCore',
 			formats: ['es', 'cjs'],
 			fileName: (format) => {
 				if (format === 'es') return 'index.js'

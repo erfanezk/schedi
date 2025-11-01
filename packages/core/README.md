@@ -1,15 +1,15 @@
-# @schedi/core
+# @taskwave/core
 
 Core scheduling functionality for JavaScript and TypeScript applications.
 
 ## Installation
 
 ```bash
-npm install @schedi/core
+npm install @taskwave/core
 # or
-pnpm add @schedi/core
+pnpm add @taskwave/core
 # or
-yarn add @schedi/core
+yarn add @taskwave/core
 ```
 
 ## Usage
@@ -19,7 +19,7 @@ yarn add @schedi/core
 Schedule tasks that execute once at a specific time:
 
 ```typescript
-import { OneTimeTaskRunner } from '@schedi/core'
+import { OneTimeTaskRunner } from '@taskwave/core'
 
 const runner = new OneTimeTaskRunner()
 
@@ -38,7 +38,7 @@ runner.start()
 Schedule tasks that execute repeatedly at a fixed interval:
 
 ```typescript
-import { IntervalTaskRunner } from '@schedi/core'
+import { IntervalTaskRunner } from '@taskwave/core'
 
 const runner = new IntervalTaskRunner()
 

@@ -1,4 +1,4 @@
-# Schedi
+# Taskwave
 
 A modular scheduling library with React integration.
 
@@ -7,10 +7,10 @@ A modular scheduling library with React integration.
 This is a pnpm workspace monorepo containing multiple packages:
 
 ```
-schedi/
+taskwave/
 ├── packages/
-│   ├── core/          # @schedi/core - Core scheduling functionality
-│   └── react/         # @schedi/react - React bindings
+│   ├── core/          # @taskwave/core - Core scheduling functionality
+│   └── react/         # @taskwave/react - React bindings
 ├── pnpm-workspace.yaml
 ├── package.json
 └── tsconfig.json
@@ -40,17 +40,17 @@ pnpm dev
 
 ## Packages
 
-### @schedi/core
+### @taskwave/core
 
 Core scheduling functionality that can be used in any JavaScript environment.
 
-### @schedi/react
+### @taskwave/react
 
-React hooks and components for using schedi in React applications.
+React hooks and components for using taskwave in React applications.
 
 ## Package Dependencies
 
-- `@schedi/react` depends on `@schedi/core` using workspace protocol
+- `@taskwave/react` depends on `@taskwave/core` using workspace protocol
 - TypeScript project references ensure proper type checking across packages
 - No relative paths needed - packages reference each other by name
 

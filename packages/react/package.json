@@ -1,7 +1,7 @@
 {
-  "name": "@schedi/react",
+  "name": "@taskwave/react",
   "version": "0.0.0",
-  "description": "React bindings for schedi",
+  "description": "React bindings for taskwave",
   "keywords": [
     "scheduler",
     "task-scheduler",
@@ -16,12 +16,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/erfanezk/schedi.git",
+    "url": "https://github.com/erfanezk/taskwave.git",
     "directory": "packages/react"
   },
-  "homepage": "https://github.com/erfanezk/schedi#readme",
+  "homepage": "https://github.com/erfanezk/taskwave#readme",
   "bugs": {
-    "url": "https://github.com/erfanezk/schedi/issues"
+    "url": "https://github.com/erfanezk/taskwave/issues"
   },
   "type": "module",
   "main": "./dist/index.cjs",
@@ -48,7 +48,7 @@
     "publish:npm": "pnpm publish --access public"
   },
   "dependencies": {
-    "@schedi/core": "workspace:*"
+    "@taskwave/core": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.0.0"

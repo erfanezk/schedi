@@ -1,5 +1,5 @@
 /**
- * @schedi/core
+ * @taskwave/core
  * Core scheduling functionality
  */
 
