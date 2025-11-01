@@ -1,6 +1,6 @@
 {
   "name": "@taskwave/core",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Core scheduling functionality for JavaScript and TypeScript applications",
   "keywords": [
     "scheduler",
@@ -18,7 +18,7 @@
     "url": "https://github.com/erfanezk/taskwave.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/erfanezk/taskwave/packages/core#readme",
+  "homepage": "https://github.com/erfanezk/taskwave/blob/master/packages/core/README.md",
   "bugs": {
     "url": "https://github.com/erfanezk/taskwave/issues"
   },
