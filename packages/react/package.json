@@ -1,7 +1,28 @@
 {
   "name": "@schedi/react",
   "version": "0.0.0",
+  "description": "React bindings for schedi",
+  "keywords": [
+    "scheduler",
+    "task-scheduler",
+    "interval",
+    "timeout",
+    "timing",
+    "react",
+    "hooks",
+    "typescript"
+  ],
+  "author": "erfanezk",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erfanezk/schedi.git",
+    "directory": "packages/react"
+  },
+  "homepage": "https://github.com/erfanezk/schedi#readme",
+  "bugs": {
+    "url": "https://github.com/erfanezk/schedi/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -13,7 +34,7 @@
         "default": "./dist/index.js"
       },
       "require": {
-        "types": "./dist/index.d.cts",
+        "types": "./dist/index.d.ts",
         "default": "./dist/index.cjs"
       }
     }
@@ -22,8 +43,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build && tsc --project tsconfig.build.json",
-    "dev": "vite build --watch"
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "publish:npm": "pnpm publish --access public"
   },
   "dependencies": {
     "@schedi/core": "workspace:*"

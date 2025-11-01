@@ -47,6 +47,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "publish:npm": "pnpm publish --access public",
     "tag": "node scripts/create-tag.js",
     "tag:patch": "pnpm version patch && pnpm tag",
     "tag:minor": "pnpm version minor && pnpm tag",
