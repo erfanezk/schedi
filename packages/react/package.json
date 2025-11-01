@@ -55,9 +55,9 @@
     "tag:minor": "pnpm version minor && pnpm tag",
     "tag:major": "pnpm version major && pnpm tag",
     "release": "node scripts/create-tag.js --push",
-    "release:patch": "pnpm version patch && pnpm release",
-    "release:minor": "pnpm version minor && pnpm release",
-    "release:major": "pnpm version major && pnpm release"
+    "release:patch": "pnpm version patch && git add package.json && (git add ../../pnpm-lock.yaml || true) && git commit -m \"chore(react): bump version\" && pnpm release",
+    "release:minor": "pnpm version minor && git add package.json && (git add ../../pnpm-lock.yaml || true) && git commit -m \"chore(react): bump version\" && pnpm release",
+    "release:major": "pnpm version major && git add package.json && (git add ../../pnpm-lock.yaml || true) && git commit -m \"chore(react): bump version\" && pnpm release"
   },
   "dependencies": {
     "@taskwave/core": "^2.0.4",
