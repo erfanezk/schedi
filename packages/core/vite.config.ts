@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
+import dts from 'vite-plugin-dts'
 
 export default defineConfig({
 	resolve: {
@@ -7,6 +8,15 @@ export default defineConfig({
 			'@': resolve(__dirname, 'src')
 		}
 	},
+	plugins: [
+		dts({
+			entryRoot: 'src',
+			outDir: 'dist',
+			include: ['src/**/*.ts'],
+			rollupTypes: true,
+			exclude: ['**/*.test.ts', '**/*.spec.ts', 'tests/**']
+		})
+	],
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
@@ -20,9 +30,14 @@ export default defineConfig({
 		},
 		rollupOptions: {
 			output: {
-				preserveModules: false
+				preserveModules: false,
+				compact: true
 			}
 		},
-		sourcemap: true
+		minify: 'esbuild',
+		target: 'es2020',
+		sourcemap: false,
+		reportCompressedSize: false,
+		chunkSizeWarningLimit: 1000
 	}
 })

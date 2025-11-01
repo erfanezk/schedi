@@ -42,7 +42,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build && tsc --project tsconfig.build.json",
+    "build": "vite build && node scripts/check-dist.js",
     "dev": "vite build --watch",
     "test": "vitest run",
     "test:watch": "vitest",
