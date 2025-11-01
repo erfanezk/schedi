@@ -1,6 +1,6 @@
 {
   "name": "@schedi/core",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Core scheduling functionality for JavaScript and TypeScript applications",
   "keywords": [
     "scheduler",
@@ -46,7 +46,15 @@
     "dev": "vite build --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "tag": "node scripts/create-tag.js",
+    "tag:patch": "pnpm version patch && pnpm tag",
+    "tag:minor": "pnpm version minor && pnpm tag",
+    "tag:major": "pnpm version major && pnpm tag",
+    "release": "node scripts/create-tag.js --push",
+    "release:patch": "pnpm version patch && pnpm release",
+    "release:minor": "pnpm version minor && pnpm release",
+    "release:major": "pnpm version major && pnpm release"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
