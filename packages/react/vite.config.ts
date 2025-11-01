@@ -3,6 +3,11 @@ import { resolve } from 'path'
 import dts from 'vite-plugin-dts'
 
 export default defineConfig({
+	resolve: {
+		alias: {
+			'@': resolve(__dirname, 'src')
+		}
+	},
 	plugins: [
 		dts({
 			entryRoot: 'src',
@@ -32,6 +37,10 @@ export default defineConfig({
 				}
 			}
 		},
-		sourcemap: true
+		minify: 'esbuild',
+		target: 'es2020',
+		sourcemap: false,
+		reportCompressedSize: false,
+		chunkSizeWarningLimit: 1000
 	}
 })

@@ -1,6 +1,6 @@
 {
   "name": "@taskwave/react",
-  "version": "0.0.0",
+  "version": "2.0.0",
   "description": "React bindings for taskwave",
   "keywords": [
     "scheduler",
@@ -43,23 +43,40 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && pnpm check-dist",
+    "check-dist": "node scripts/check-dist.js",
     "dev": "vite build --watch",
-    "publish:npm": "pnpm publish --access public"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "publish:npm": "pnpm publish --access public",
+    "tag": "node scripts/create-tag.js",
+    "tag:patch": "pnpm version patch && pnpm tag",
+    "tag:minor": "pnpm version minor && pnpm tag",
+    "tag:major": "pnpm version major && pnpm tag",
+    "release": "node scripts/create-tag.js --push",
+    "release:patch": "pnpm version patch && pnpm release",
+    "release:minor": "pnpm version minor && pnpm release",
+    "release:major": "pnpm version major && pnpm release"
   },
   "dependencies": {
-    "@taskwave/core": "workspace:*"
+    "@taskwave/core": "^2.0.4",
+    "lodash": "^4.17.21"
   },
   "peerDependencies": {
-    "react": "^18.0.0"
+    "react": "^19.0.0"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.0",
+    "@types/lodash": "^4.17.20",
     "@types/node": "^20.0.0",
-    "@types/react": "^18.2.0",
-    "react": "^18.2.0",
+    "@types/react": "^19.0.0",
+    "jsdom": "^27.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.2.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.0",
-    "vite-plugin-dts": "^3.7.0"
+    "vite-plugin-dts": "^3.7.0",
+    "vitest": "^4.0.6"
   }
 }
-
