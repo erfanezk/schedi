@@ -18,7 +18,7 @@
     "url": "https://github.com/erfanezk/taskwave.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/erfanezk/taskwave#readme",
+  "homepage": "https://github.com/erfanezk/taskwave/packages/core#readme",
   "bugs": {
     "url": "https://github.com/erfanezk/taskwave/issues"
   },
