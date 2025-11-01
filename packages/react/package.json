@@ -19,7 +19,7 @@
     "url": "https://github.com/erfanezk/taskwave.git",
     "directory": "packages/react"
   },
-  "homepage": "https://github.com/erfanezk/taskwave#readme",
+  "homepage": "https://github.com/erfanezk/taskwave/blob/master/packages/react/README.md",
   "bugs": {
     "url": "https://github.com/erfanezk/taskwave/issues"
   },
