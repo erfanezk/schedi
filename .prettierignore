@@ -1,0 +1,18 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+*.tsbuildinfo
+
+# Ignore generated files
+coverage
+.nyc_output
+
+# Ignore lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+
