@@ -1,0 +1,19 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "packages/core/src/index.ts",
+    "packages/react/src/index.ts"
+  ],
+  "out": "./docs",
+  "tsconfig": "./tsconfig.docs.json",
+  "readme": "./README.md",
+  "gitRevision": "master",
+  "sort": ["kind", "instance-first"],
+  "plugin": ["typedoc-plugin-markdown"],
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeExternals": true,
+  "name": "Taskwave API Documentation",
+  "categorizeByGroup": true
+}

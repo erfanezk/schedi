@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "emitDeclarationOnly": false,
+    "declaration": true,
+    "declarationMap": false,
+    "noEmit": true,
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": [
+        "./packages/core/src/*",
+        "./packages/react/src/*"
+      ],
+      "@taskwave/core": ["./packages/core/src/index.ts"],
+      "@taskwave/react": ["./packages/react/src/index.ts"]
+    }
+  },
+  "files": [
+    "packages/core/src/index.ts",
+    "packages/react/src/index.ts"
+  ],
+  "include": [
+    "packages/core/src/**/*",
+    "packages/react/src/**/*"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/dist",
+    "**/tests",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
+}
+
