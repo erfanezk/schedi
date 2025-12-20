@@ -73,6 +73,7 @@ function useIntervalTaskRunner({
 
 		const newRunner = new IntervalTaskRunner([], config)
 		runnerRef.current = newRunner
+		prevConfig.current = config
 
 		return () => {
 			newRunner.clear()

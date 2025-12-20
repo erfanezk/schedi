@@ -74,6 +74,7 @@ function useOneTimeTaskRunner({
 
 		const newRunner = new OneTimeTaskRunner([], config)
 		runnerRef.current = newRunner
+		prevConfig.current = config
 
 		return () => {
 			newRunner.clear()
