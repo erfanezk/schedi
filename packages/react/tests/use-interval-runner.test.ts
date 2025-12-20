@@ -942,6 +942,50 @@ describe('useIntervalTaskRunner', () => {
 			// then
 			// Should not throw errors during cleanup
 		})
+
+		it('should not reinitialize runner when parent component re-renders', () => {
+			// given
+			const { result, rerender } = renderHook(() => useIntervalTaskRunner())
+
+			// Add a task and capture its ID
+			let taskId: string | undefined
+			act(() => {
+				const task = result.current.addTask({
+					interval: 1000,
+					callback: vi.fn(),
+					name: 'test-task',
+					startAt: Date.now()
+				})
+				taskId = task?.id
+			})
+
+			expect(result.current.tasks).toHaveLength(1)
+			const initialTask = result.current.tasks[0]!
+			expect(taskId).toBeDefined()
+
+			rerender()
+
+			// then - runner should not be reinitialized
+			// Tasks should persist across re-renders
+			expect(result.current.tasks).toHaveLength(1)
+			expect(result.current.tasks[0]!.id).toBe(taskId)
+			expect(result.current.tasks[0]!.id).toBe(initialTask.id)
+			expect(result.current.tasks[0]!.interval).toBe(initialTask.interval)
+			expect(result.current.tasks[0]!.name).toBe(initialTask.name)
+
+			// Verify we can still interact with the same runner instance
+			act(() => {
+				result.current.addTask({
+					interval: 2000,
+					callback: vi.fn(),
+					name: 'second-task',
+					startAt: Date.now()
+				})
+			})
+
+			expect(result.current.tasks).toHaveLength(2)
+			expect(result.current.getTask(taskId!)).toBeDefined()
+		})
 	})
 
 	describe('real runner integration', () => {
